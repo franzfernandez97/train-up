@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Alert } from 'react-native';
 import type { AuthResponse } from '../models/AuthResponse';
 import type { User } from '../models/User';
 import { login as apiLogin, logout as apiLogout } from '../services/AuthService';
+import { showAlert } from '../utils/AlertService'; // ✅ Importación
 import { deleteItem, getItem, saveItem } from '../utils/SecureStorage';
 
 interface AuthContextProps {
@@ -11,7 +11,7 @@ interface AuthContextProps {
   logout: () => Promise<void>;
   loading: boolean;
   error: string;
-  initializing: boolean; // NUEVO: indica si está cargando el usuario inicial
+  initializing: boolean;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -19,7 +19,7 @@ const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
-  const [initializing, setInitializing] = useState(true); // NUEVO
+  const [initializing, setInitializing] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       } catch (err) {
         console.warn('Error cargando usuario desde SecureStorage:', err);
       } finally {
-        setInitializing(false); // NUEVO: termina carga inicial
+        setInitializing(false);
       }
     };
     loadUser();
@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (e: any) {
       const msg = e?.response?.data?.message ?? 'Error al iniciar sesión';
       setError(msg);
-      Alert.alert('Login Fallido', msg);
+      showAlert('Login Fallido', msg); // ✅ Alerta usando servicio
     } finally {
       setLoading(false);
     }
@@ -64,8 +64,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } finally {
       await deleteItem('token');
       await deleteItem('user');
-      setUser(null); // Esto reinicia la navegación automáticamente
-      console.log("Usuario cerrado sesión y eliminado del contexto");
+      setUser(null);
     }
   };
 

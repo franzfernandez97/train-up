@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
+import { showAlert } from '../utils/AlertService';
 import { styles } from './styles/RegisterScreen.styles';
 
 export default function RegisterScreen({ navigation }: any) {
@@ -18,12 +18,12 @@ export default function RegisterScreen({ navigation }: any) {
 
   const handleRegister = async () => {
     if (!email || !name || !password || !confirmPassword) {
-      Alert.alert('Error', 'Todos los campos son obligatorios.');
+      showAlert('Error', 'Todos los campos son obligatorios.');
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert('Error', 'Las contraseñas no coinciden.');
+      showAlert('Error', 'Las contraseñas no coinciden.');
       return;
     }
 
@@ -41,11 +41,11 @@ export default function RegisterScreen({ navigation }: any) {
         throw new Error(data.message || 'Registro fallido');
       }
 
-      Alert.alert('Registro exitoso', 'Ahora puedes iniciar sesión.', [
-        { text: 'OK', onPress: () => navigation.navigate('Login') },
-      ]);
+      showAlert('Registro exitoso', 'Ahora puedes iniciar sesión.', () => {
+        navigation.navigate('Login');
+      });
     } catch (err: any) {
-      Alert.alert('Error', err.message);
+      showAlert('Error', err.message);
     } finally {
       setLoading(false);
     }

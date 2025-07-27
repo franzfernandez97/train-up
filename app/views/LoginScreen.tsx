@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -10,10 +10,10 @@ import {
   View,
 } from 'react-native';
 
-import { styles } from './styles/LoginScreen.styles';
-
 import { useAuth } from '../contexts/AuthContext';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import { showAlert } from '../utils/AlertService'; // ✅ alerta centralizada
+import { styles } from './styles/LoginScreen.styles';
 
 export default function LoginScreen() {
   const { login, loading, error } = useAuth();
@@ -21,6 +21,13 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
 
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  // ✅ Mostrar alerta si hay error
+  useEffect(() => {
+    if (error) {
+      showAlert('Error', error);
+    }
+  }, [error]);
 
   return (
     <View style={styles.container}>
@@ -51,9 +58,6 @@ export default function LoginScreen() {
         onChangeText={setPassword}
         secureTextEntry
       />
-
-      {/* Error */}
-      {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
       {/* Botón Iniciar sesión */}
       <TouchableOpacity

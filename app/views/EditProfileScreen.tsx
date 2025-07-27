@@ -1,9 +1,9 @@
-// /views/EditProfileScreen.tsx
 import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
-import { Alert, Button, Text, TextInput, View } from 'react-native';
+import { Button, Text, TextInput, View } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import { updateUser } from '../services/UserService';
+import { showAlert } from '../utils/AlertService'; // ✅ importación del servicio
 import { styles } from './styles/EditProfileScreen.styles';
 
 export default function EditProfileScreen() {
@@ -25,9 +25,9 @@ export default function EditProfileScreen() {
         new_password: newPassword,
         new_password_confirmation: confirmPassword,
       });
-      Alert.alert('Éxito', 'Perfil actualizado correctamente');
+      showAlert('Éxito', 'Perfil actualizado correctamente');
     } catch (error) {
-      Alert.alert('Error', 'No se pudo actualizar el perfil');
+      showAlert('Error', 'No se pudo actualizar el perfil');
       console.error(error);
     }
   };

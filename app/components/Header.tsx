@@ -5,7 +5,9 @@ import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import { showConfirm } from '../utils/AlertService';
 import { styles } from './styles/Header.styles';
+
 
 export default function Header() {
   
@@ -14,21 +16,23 @@ export default function Header() {
 
 
   const handleNavigateToProfile = () => {
-    console.log("Handle  Navigate");
     navigation.navigate('EditProfile');
   };
 
-const handleLogout = async () => {
-  console.log("Handle LogOut");
-  console.log("Logout desde Header:", logout);
-
-  try {
-    await logout();
-    console.log("Sesión cerrada correctamente");
-  } catch (e) {
-    console.error("Error al cerrar sesión:", e);
-  }
-};
+  const handleLogout = () => {
+    showConfirm(
+      'Cerrar sesión',
+      '¿Estás seguro de que deseas cerrar sesión?',
+      async () => {
+        try {
+          await logout();
+          console.log('Sesión cerrada correctamente');
+        } catch (e) {
+          console.error('Error al cerrar sesión:', e);
+        }
+      }
+    );
+  };
 
 
   return (

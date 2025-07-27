@@ -5,7 +5,7 @@ import useAtletaRutinasDelDia from '../../viewmodels/useAtletaRutinasDelDia';
 import { styles } from '../styles/HomeScreen.styles';
 
 export default function HomeAtleta() {
-  const { rutinas, loading } = useAtletaRutinasDelDia();
+  const { rutinas  } = useAtletaRutinasDelDia();
 
   if (rutinas.length === 0) {
     return (
