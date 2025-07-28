@@ -40,7 +40,7 @@ export default function HomeAtleta() {
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <TouchableOpacity
-            style={styles.rutinaBox}
+            style={[styles.rutinaBox, { flexDirection: 'row', alignItems: 'center' }]}
             onPress={() =>
               navigation.navigate('RutinaDetalle', {
                 rutinaId: item.rutina.id,
@@ -58,7 +58,7 @@ export default function HomeAtleta() {
               <Text style={styles.rutinaNombre}>
                 {item.rutina?.nombre ?? 'Rutina'}
               </Text>
-              <Text style={styles.subtitle}>ID: {item.rutina_id}</Text>
+              <Text style={styles.subtitle}>{item.rutina?.ejercicios?.length ?? 0} Ejercicios</Text>
             </View>
           </TouchableOpacity>
         )}

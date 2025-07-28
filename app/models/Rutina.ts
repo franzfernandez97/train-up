@@ -1,3 +1,5 @@
+import { Ejercicio } from './Ejercicio';
+
 export interface Rutina {
   id: number;
   nombre: string;
@@ -5,4 +7,5 @@ export interface Rutina {
   entrenador_id: number;
   created_at: string;
   updated_at: string;
+  ejercicios: Ejercicio[];
 }

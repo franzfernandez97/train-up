@@ -15,7 +15,6 @@ export const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    marginBottom: 30,
   },
   buttonContainer: {
     width: '100%',
