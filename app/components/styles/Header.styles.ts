@@ -11,7 +11,11 @@ export const styles = StyleSheet.create({
   rightIcons: {
     flexDirection: 'row',
   },
+  leftIcons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   icon: {
-    marginLeft: 16,
+    marginLeft: 8,
   },
 });

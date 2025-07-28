@@ -1,8 +1,8 @@
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useNavigationState } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { Platform, TouchableOpacity, View } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { showConfirm } from '../utils/AlertService';
@@ -10,10 +10,10 @@ import { styles } from './styles/Header.styles';
 
 
 export default function Header() {
-  
+
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { logout } = useAuth();
-
+  const canGoBack = useNavigationState(state => state?.routes?.length > 1);
 
   const handleNavigateToProfile = () => {
     navigation.navigate('EditProfile');
@@ -36,11 +36,20 @@ export default function Header() {
 
   return (
     <View style={styles.header}>
-      {/* Icono para volver o editar perfil */}
-      <TouchableOpacity onPress={handleNavigateToProfile}>
-        <Ionicons name="person-circle-outline" size={32} color="#000" />
-      </TouchableOpacity>
 
+      <View style={styles.leftIcons}>
+        {/* Icono "Volver" solo en web y si hay historial */}
+        {Platform.OS === 'web' && canGoBack && (
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.icon}>
+            <Ionicons name="arrow-back" size={24} color="#000" />
+          </TouchableOpacity>
+        )}
+
+        {/* Icono para volver o editar perfil */}
+        <TouchableOpacity onPress={handleNavigateToProfile}>
+          <Ionicons name="person-circle-outline" size={32} color="#000" />
+        </TouchableOpacity>
+      </View>
       {/* Chat, Notificación, Logout */}
       <View style={styles.rightIcons}>
         <TouchableOpacity style={styles.icon}>
