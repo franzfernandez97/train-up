@@ -1,12 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import { RouteProp, useRoute } from '@react-navigation/native';
-import React from 'react';
+import React, { useState } from 'react';
 import {
-    ActivityIndicator,
-    FlatList,
-    Text,
-    TouchableOpacity,
-    View
+  ActivityIndicator,
+  FlatList,
+  Image,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import RoleBasedLayout from '../components/RoleBasedLayout';
 import { RootStackParamList } from '../navigation/AppNavigator';
@@ -19,53 +20,53 @@ type RutinaDetalleRouteProp = RouteProp<RootStackParamList, 'RutinaDetalle'>;
 export default function RutinaDetalleScreen() {
   const route = useRoute<RutinaDetalleRouteProp>();
   const { rutinaId, rutinaNombre } = route.params;
-
+  const [expanded, setExpanded] = useState(false);
   const { ejercicios, loading, error } = useRutinaDetalleViewModel(rutinaId);
-
-    const getIconNameByGrupo = (
-    grupo: string | undefined
-    ): keyof typeof Ionicons.glyphMap => {
-    if (!grupo) return 'help-outline';
-
-    const key = grupo.toLowerCase();
-
-    if (key.includes('pectorales')) return 'barbell-outline';
-    if (key.includes('dorsales')) return 'body-outline';
-    if (key.includes('deltoides')) return 'fitness-outline';
-    if (key.includes('bíceps') || key.includes('biceps')) return 'hand-left-outline';
-    if (key.includes('tríceps') || key.includes('triceps')) return 'hand-right-outline';
-    if (key.includes('trapecios')) return 'expand-outline';
-    if (key.includes('abdominales')) return 'accessibility-outline';
-    if (key.includes('oblicuos')) return 'swap-horizontal-outline';
-    if (key.includes('lumbar')) return 'git-branch-outline';
-    if (key.includes('glúteos') || key.includes('gluteos')) return 'walk-outline';
-    if (key.includes('cuádriceps') || key.includes('cuadriceps')) return 'footsteps-outline';
-    if (key.includes('isquiotibiales')) return 'trending-down-outline';
-    if (key.includes('gemelos')) return 'trending-up-outline';
-
-    return 'help-outline'; // fallback
-    };
-
-
 
 const renderItem = ({ item }: any) => (
   <View style={styles.card}>
-    {/* Ícono del grupo muscular a la izquierda */}
-    <Ionicons
-      name={getIconNameByGrupo(item.ejercicio?.grupoMuscular)}
-      size={32}
+    {/* Columna 1: Ícono grupo muscular */}
+    <Image
+      source={require('../assets/images/logo.png')}
       style={styles.leftIcon}
     />
 
-    {/* Contenido principal */}
+    {/* Columna 2: Nombre, series, repeticiones, descanso */}
     <View style={styles.cardContent}>
       <Text style={styles.title}>
         {item.ejercicio?.nombre ?? 'Ejercicio sin nombre'}
       </Text>
-      <Text style={styles.subtitle}>4 series / 10 repeticiones</Text>
+      <Text style={styles.subtitle}>
+        Series: {item.seriesObjetivo}
+      </Text>
+      <Text style={styles.subtitle}>
+        Repeticiones: {item.repObjetivo}
+      </Text>
+      <Text style={styles.subtitle}>
+        Descanso: {item.descanso}
+      </Text>
     </View>
 
-    {/* Ícono de información a la derecha */}
+    {/* Columna 3: Comentario */}
+{item.comentario ? (
+        <TouchableOpacity
+          style={styles.commentContainer}
+          onPress={() => setExpanded(!expanded)}
+          activeOpacity={0.7}
+        >
+          <Text
+            style={styles.commentText}
+            numberOfLines={expanded ? undefined : 3}
+            ellipsizeMode="tail"
+          >
+            💬 {item.comentario}
+          </Text>
+        </TouchableOpacity>
+      ) : (
+        <View style={styles.commentContainer} />
+      )}
+
+    {/* Columna 4: Ícono de información */}
     <Ionicons
       name="information-circle-outline"
       size={24}
@@ -73,7 +74,6 @@ const renderItem = ({ item }: any) => (
     />
   </View>
 );
-
 
 
   if (loading) return <ActivityIndicator style={{ marginTop: 20 }} />;

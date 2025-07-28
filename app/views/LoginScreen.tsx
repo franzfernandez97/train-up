@@ -34,7 +34,7 @@ export default function LoginScreen() {
       {/* Logo circular */}
       <View style={styles.logoContainer}>
         <View style={styles.logoCircle}>
-          <Image source={require('../../assets/images/logo.png')} style={styles.logo} />
+          <Image source={require('../assets/images/logo.png')} style={styles.logo} />
         </View>
       </View>
 
