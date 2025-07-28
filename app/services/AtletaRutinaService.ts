@@ -15,7 +15,6 @@ export const getRutinasAsignadasPorDia = async (dia: string): Promise<AtletaRuti
       },
     });
     const rutinas = response.data.data;
-    console.log(response);
 
     return Array.isArray(rutinas) ? rutinas : [];
   } catch (error) {

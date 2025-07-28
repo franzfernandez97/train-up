@@ -3,6 +3,7 @@ import React from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import EditProfileScreen from '../views/EditProfileScreen';
+import EjercicioScreen from '../views/EjercicioScreen';
 import HomeScreen from '../views/HomeScreen';
 import LoginScreen from '../views/LoginScreen';
 import RegisterScreen from '../views/RegisterScreen';
@@ -15,7 +16,17 @@ export type RootStackParamList = {
   SignUp: undefined;
   EditProfile: undefined;
   Rutinas: undefined;
-  RutinaDetalle: { rutinaId: number; rutinaNombre: string };
+  RutinaDetalle: { 
+    rutinaId: number; 
+    rutinaNombre: string 
+  };
+  Ejercicio: {
+    rutinaId: number;
+    ejercicioId: number;
+    seriesObjetivo: number;
+    repObjetivo: number;
+    descanso: string;
+  };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -47,6 +58,7 @@ export default function AppNavigator() {
           <Stack.Screen name="EditProfile" component={EditProfileScreen} />
           <Stack.Screen name="Rutinas" component={RutinasScreen} />
           <Stack.Screen name="RutinaDetalle" component={RutinaDetalleScreen} />
+          <Stack.Screen name="Ejercicio" component={EjercicioScreen} />
         </>
       )}
     </Stack.Navigator>

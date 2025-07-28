@@ -6,75 +6,91 @@ export const styles = StyleSheet.create({
     backgroundColor: '#f2f2f2',
     flex: 1,
   },
+
   header: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 12,
   },
+
   list: {
     gap: 10,
   },
-startButton: {
+
+  startButton: {
     backgroundColor: '#1E4FD8',
     padding: 14,
     borderRadius: 6,
     marginTop: 20,
     alignItems: 'center',
   },
+
   startButtonText: {
     color: '#fff',
     fontWeight: 'bold',
   },
-card: {
-  flexDirection: 'row',
-  alignItems: 'flex-start',
-  backgroundColor: '#fff',
-  padding: 12,
-  borderRadius: 8,
-  marginBottom: 10,
-  gap: 10,
-},
 
-leftIcon: {
-  marginTop:10,
-  width: 60,
-  height: 60,
-},
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    padding: 12,
+    borderRadius: 8,
+    gap: 10,
+  },
 
-cardContent: {
-  flex: 2,
-  justifyContent: 'center',
-},
+  // Columna 1: ícono de grupo muscular
+  leftIconContainer: {
+    flex: 0.7,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 
-commentContainer: {
-  flex: 1.2,
-  justifyContent: 'center',
-  paddingHorizontal: 4,
-  flexShrink: 1,
-},
+  leftIcon: {
+    width: 40,
+    height: 40,
+    resizeMode: 'contain',
+  },
 
-commentText: {
-  fontSize: 10,
-  fontStyle: 'italic',
-  color: '#444',
-  lineHeight: 16,
-},
+  // Columna 2: contenido principal (nombre, series, etc.)
+  cardContent: {
+    flex: 2.5,
+    justifyContent: 'center',
+  },
 
-infoIcon: {
-  width: 24,
-  justifyContent: 'center',
-  marginTop: 4,
-  color: '#333',
-},
+  title: {
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
 
-title: {
-  fontWeight: 'bold',
-  fontSize: 14,
-},
+  subtitle: {
+    fontSize: 12,
+    color: '#666',
+  },
 
-subtitle: {
-  fontSize: 12,
-  color: '#666',
-},
+  // Columna 3: comentario expandible
+  commentContainer: {
+    flex: 1.3,
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+    flexShrink: 1,
+  },
 
+  commentText: {
+    fontSize: 10,
+    fontStyle: 'italic',
+    color: '#444',
+    lineHeight: 16,
+  },
+
+  // Columna 4: ícono de información
+  infoIconContainer: {
+    flex: 0.5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  infoIcon: {
+    color: '#333',
+  },
 });
