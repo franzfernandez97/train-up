@@ -1,3 +1,5 @@
+import { Rutina } from './Rutina';
+
 export interface AtletaRutina {
   id: number;
   atleta_id: number;
@@ -6,8 +8,5 @@ export interface AtletaRutina {
   frecuencia: string;
   created_at: string;
   updated_at: string;
-  rutina?: {
-    id: number;
-    nombre: string;
-  };
+  rutina: Rutina; // ✅ Enlace correcto al modelo completo
 }

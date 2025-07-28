@@ -13,17 +13,17 @@ export default function AdminLayout({ children }: Props) {
   const insets = useSafeAreaInsets();
 
   return (
-    <>
-      <Header />
-      <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
-        <View style={styles.container}>
-          
-          <View style={styles.content}>{children}</View>
-          <View style={[styles.footerContainer, { paddingBottom: insets.bottom }]}>
-            <AdminFooter />
-          </View>
+    <SafeAreaView style={styles.safeArea} edges={['left', 'right', 'top']}>
+      <View style={{ paddingTop: insets.top }}>
+        <Header />
+      </View>
+      <View style={styles.container}>
+
+        <View style={styles.content}>{children}</View>
+        <View style={[styles.footerContainer, { paddingBottom: insets.bottom }]}>
+          <AdminFooter />
         </View>
-      </SafeAreaView>
-    </>
+      </View>
+    </SafeAreaView>
   );
 }

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { AuthResponse } from '../models/AuthResponse';
 import type { User } from '../models/User';
-import { login as apiLogin, logout as apiLogout } from '../services/AuthService';
+import { login as apiLogin, logout as apiLogout, getCurrentUser } from '../services/AuthService';
 import { showAlert } from '../utils/AlertService'; // ✅ Importación
 import { deleteItem, getItem, saveItem } from '../utils/SecureStorage';
 
@@ -9,6 +9,7 @@ interface AuthContextProps {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
   loading: boolean;
   error: string;
   initializing: boolean;
@@ -21,6 +22,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(false);
   const [initializing, setInitializing] = useState(true);
   const [error, setError] = useState('');
+  const refreshUser = async () => {
+  try {
+    const token = await getItem('token');
+    const storedUser = await getItem('user');
+    if (!token || !storedUser) return;
+
+    const parsedUser = JSON.parse(storedUser);
+    const updatedUser = await getCurrentUser(parsedUser.id, token);
+
+    await saveItem('user', JSON.stringify(updatedUser));
+    setUser(updatedUser);
+  } catch (e) {
+    console.warn('Error actualizando usuario:', e);
+  }
+};
 
   useEffect(() => {
     const loadUser = async () => {
@@ -70,7 +86,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, login, logout, loading, error, initializing }}
+      value={{ user, login, logout, refreshUser, loading, error, initializing }}
     >
       {children}
     </AuthContext.Provider>

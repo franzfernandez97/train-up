@@ -6,12 +6,16 @@ import EditProfileScreen from '../views/EditProfileScreen';
 import HomeScreen from '../views/HomeScreen';
 import LoginScreen from '../views/LoginScreen';
 import RegisterScreen from '../views/RegisterScreen';
+import RutinaDetalleScreen from '../views/RutinaDetalleScreen';
+import RutinasScreen from '../views/RutinaScreen';
 
 export type RootStackParamList = {
   Login: undefined;
   Home: undefined;
   SignUp: undefined;
   EditProfile: undefined;
+  Rutinas: undefined;
+  RutinaDetalle: { rutinaId: number; rutinaNombre: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -31,14 +35,18 @@ export default function AppNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {!user ? (
+        //si el usuario NO esta loggeado solo puedo usar estas vistas
         <>
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="SignUp" component={RegisterScreen} />
         </>
       ) : (
+        //si el usuario esta loggeado
         <>
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+          <Stack.Screen name="Rutinas" component={RutinasScreen} />
+          <Stack.Screen name="RutinaDetalle" component={RutinaDetalleScreen} />
         </>
       )}
     </Stack.Navigator>

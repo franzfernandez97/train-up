@@ -26,7 +26,6 @@ export default function Header() {
       async () => {
         try {
           await logout();
-          console.log('Sesión cerrada correctamente');
         } catch (e) {
           console.error('Error al cerrar sesión:', e);
         }
@@ -55,7 +54,6 @@ export default function Header() {
         <TouchableOpacity
           style={styles.icon}
           onPress={() => {
-            console.log("Icono Logout presionado");
             handleLogout();
           }}
         >

@@ -1,14 +1,17 @@
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
 import { Button, Text, TextInput, View } from 'react-native';
+import RoleBasedLayout from '../components/RoleBasedLayout';
 import { useAuth } from '../contexts/AuthContext';
+import { RootStackParamList } from '../navigation/AppNavigator';
 import { updateUser } from '../services/UserService';
 import { showAlert } from '../utils/AlertService'; // ✅ importación del servicio
 import { styles } from './styles/EditProfileScreen.styles';
 
 export default function EditProfileScreen() {
   const { user } = useAuth();
-  const navigation = useNavigation();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const [name, setName] = useState(user?.name ?? '');
   const [email, setEmail] = useState(user?.email ?? '');
@@ -26,6 +29,7 @@ export default function EditProfileScreen() {
         new_password_confirmation: confirmPassword,
       });
       showAlert('Éxito', 'Perfil actualizado correctamente');
+      navigation.navigate('Home');
     } catch (error) {
       showAlert('Error', 'No se pudo actualizar el perfil');
       console.error(error);
@@ -33,6 +37,7 @@ export default function EditProfileScreen() {
   };
 
   return (
+    <RoleBasedLayout>
     <View style={styles.container}>
       <Text style={styles.title}>Editar Perfil</Text>
 
@@ -52,7 +57,9 @@ export default function EditProfileScreen() {
       <TextInput style={styles.input} secureTextEntry value={confirmPassword} onChangeText={setConfirmPassword} />
 
       <Button title="Actualizar" onPress={handleSubmit} />
-      <Button title="Home" onPress={() => navigation.goBack()} color="#aaa" />
+
     </View>
+    </RoleBasedLayout>
+
   );
 }

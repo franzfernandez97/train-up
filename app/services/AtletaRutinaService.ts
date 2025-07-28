@@ -14,8 +14,8 @@ export const getRutinasAsignadasPorDia = async (dia: string): Promise<AtletaRuti
         'Content-Type': 'application/json',
       },
     });
-
-    const rutinas = response.data.data; // 🔧 ESTA es la lista real
+    const rutinas = response.data.data;
+    console.log(response);
 
     return Array.isArray(rutinas) ? rutinas : [];
   } catch (error) {

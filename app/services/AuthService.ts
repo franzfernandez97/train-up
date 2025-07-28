@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { User } from '../models/User';
 
 const API_URL = 'http://147.93.114.243:8080/api';
 
@@ -41,3 +42,20 @@ export const logout = async (token: string) => {
   );
   return response.data; // Ej: { message: 'Sesión cerrada' }
 };
+  /**
+ * Actualiza data del usuario
+ */
+export async function getCurrentUser(id: number, token: string): Promise<User> {
+
+  const response = await axios.get(`${API_URL}/users/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+  
+  
+  return response.data;
+};
+
+

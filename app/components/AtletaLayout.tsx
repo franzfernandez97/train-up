@@ -13,16 +13,17 @@ export default function AtletaLayout({ children }: Props) {
   const insets = useSafeAreaInsets();
 
   return (
-    <>
-      <Header />
-      <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
-        <View style={styles.container}>
-          <View style={styles.content}>{children}</View>
-          <View style={[styles.footerContainer, { paddingBottom: insets.bottom }]}>
-            <AtletaFooter />
-          </View>
+
+    <SafeAreaView style={styles.safeArea} edges={['left', 'right','top']}>
+      <View style={{ paddingTop: insets.top }}>
+        <Header />
+      </View>
+      <View style={styles.container}>
+        <View style={styles.content}>{children}</View>
+        <View style={[styles.footerContainer, { paddingBottom: insets.bottom }]}>
+          <AtletaFooter />
         </View>
-      </SafeAreaView>
-    </>
+      </View>
+    </SafeAreaView>
   );
 }
