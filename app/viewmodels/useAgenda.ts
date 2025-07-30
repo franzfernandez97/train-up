@@ -22,11 +22,6 @@ export default function useAgenda(fechaInicial?: string) {
 const fechaDesdeProp = fechaInicial ? parseISOToLocalDate(fechaInicial) : hoy;
 const fechaIsoInicial = fechaDesdeProp.toISOString().split('T')[0];
 
-  console.log('🔽 useAgenda inicializado');
-  console.log('📆 fechaInicial prop:', fechaInicial);
-  console.log('📆 fechaDesdeProp (objeto Date):', fechaDesdeProp.toString());
-  console.log('📆 fechaIsoInicial:', fechaIsoInicial);
-
   const [dias, setDias] = useState<DiaSemana[]>([]);
   const [tituloSemana, setTituloSemana] = useState('');
   const [fechaBase, setFechaBase] = useState<Date>(fechaDesdeProp);
@@ -39,7 +34,6 @@ const fechaIsoInicial = fechaDesdeProp.toISOString().split('T')[0];
     const fetchRutinas = async () => {
       try {
         const data = await getTodasLasRutinasAsignadas();
-        console.log('✅ Rutinas obtenidas:', data);
         setRutinas(data);
       } catch (error) {
         console.error('❌ Error al cargar rutinas:', error);
@@ -51,9 +45,6 @@ const fechaIsoInicial = fechaDesdeProp.toISOString().split('T')[0];
 
   // ✅ Generar la semana cuando cambia fecha base, día o rutinas
   useEffect(() => {
-    console.log('📦 Dependencias cambiaron');
-    console.log('🔄 fechaBase:', fechaBase.toISOString());
-    console.log('🔄 diaSeleccionado:', diaSeleccionado);
     generarSemanaDesdeFecha(fechaBase, diaSeleccionado);
   }, [fechaBase, diaSeleccionado, rutinas]);
 
@@ -61,9 +52,6 @@ const fechaIsoInicial = fechaDesdeProp.toISOString().split('T')[0];
     fechaReferencia: Date,
     diaSeleccionadoParam: string
   ) => {
-    console.log('📅 Generando semana desde fecha:', fechaReferencia.toISOString());
-    console.log('📍 Día seleccionado (param):', diaSeleccionadoParam);
-
     const fecha = new Date(fechaReferencia); // copia segura
     const diaSemana = (fecha.getDay() + 6) % 7; // Lunes=0
 
@@ -92,9 +80,6 @@ const fechaIsoInicial = fechaDesdeProp.toISOString().split('T')[0];
 
       const esSeleccionado = fechaIso === diaSeleccionadoParam;
 
-      if (esSeleccionado) {
-        console.log(`🎯 Día marcado como seleccionado (${label}):`, fechaIso);
-      }
 
       return {
         label,
@@ -106,30 +91,22 @@ const fechaIsoInicial = fechaDesdeProp.toISOString().split('T')[0];
       };
     });
 
-    console.log('📋 Días generados:', nuevosDias);
     setDias(nuevosDias);
 
     const encontrada = rutinas.find(r => r.dia === diaSeleccionadoParam);
     setRutinaSeleccionada(encontrada ?? null);
 
-    if (encontrada) {
-      console.log('✅ Rutina encontrada para el día seleccionado:', encontrada);
-    } else {
-      console.log('ℹ️ No hay rutina para el día seleccionado');
-    }
   };
 
   const irSemanaAnterior = () => {
     const nuevaFecha = new Date(fechaBase);
     nuevaFecha.setDate(fechaBase.getDate() - 7);
-    console.log('⬅️ Semana anterior:', nuevaFecha.toISOString());
     setFechaBase(nuevaFecha);
   };
 
   const irSemanaSiguiente = () => {
     const nuevaFecha = new Date(fechaBase);
     nuevaFecha.setDate(fechaBase.getDate() + 7);
-    console.log('➡️ Semana siguiente:', nuevaFecha.toISOString());
     setFechaBase(nuevaFecha);
   };
 

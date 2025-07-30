@@ -18,7 +18,6 @@ export default function CalendarioMensualScreen() {
   });
 
   const handleSeleccionarDia = (fecha: string) => {
-    console.log('➡️ Día seleccionado (ISO):', fecha);
     navigation.navigate('AgendaScreen', { fechaPreSeleccionada: fecha });
   };
 
