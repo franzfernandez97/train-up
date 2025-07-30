@@ -4,6 +4,7 @@ import type { User } from '../models/User';
 import { login as apiLogin, logout as apiLogout, getCurrentUser } from '../services/AuthService';
 import { showAlert } from '../utils/AlertService'; // ✅ Importación
 import { deleteItem, getItem, saveItem } from '../utils/SecureStorage';
+import { sanitizeUser } from '../utils/sanitizerUser';
 
 interface AuthContextProps {
   user: User | null;
@@ -22,21 +23,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(false);
   const [initializing, setInitializing] = useState(true);
   const [error, setError] = useState('');
+
+
   const refreshUser = async () => {
-  try {
-    const token = await getItem('token');
-    const storedUser = await getItem('user');
-    if (!token || !storedUser) return;
+    try {
+      const token = await getItem('token');
+      const storedUser = await getItem('user');
+      if (!token || !storedUser) return;
 
-    const parsedUser = JSON.parse(storedUser);
-    const updatedUser = await getCurrentUser(parsedUser.id, token);
+      const parsedUser = JSON.parse(storedUser);
+      const updatedUser = await getCurrentUser(parsedUser.id, token);
+      
+      //Sanitizar Usuarioconst sanitizedUser = sanitizeUser(res.user);
+      const sanitizedUser = sanitizeUser(updatedUser);
+      await saveItem('user', JSON.stringify(sanitizedUser));
+      //await saveItem('user', JSON.stringify(updatedUser));
+      setUser(updatedUser);
+    } catch (e) {
+      console.warn('Error actualizando usuario:', e);
 
-    await saveItem('user', JSON.stringify(updatedUser));
-    setUser(updatedUser);
-  } catch (e) {
-    console.warn('Error actualizando usuario:', e);
-  }
-};
+      // Limpieza y redirección
+      await deleteItem('token');
+      await deleteItem('user');
+      setUser(null); // Fuerza que AppNavigator redireccione
+    }
+  };
 
   useEffect(() => {
     const loadUser = async () => {
@@ -44,9 +55,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const storedUser = await getItem('user');
         if (storedUser) {
           setUser(JSON.parse(storedUser));
+        } else {
+          setUser(null); // Asegura fallback
         }
       } catch (err) {
         console.warn('Error cargando usuario desde SecureStorage:', err);
+        setUser(null); // También en error
       } finally {
         setInitializing(false);
       }
@@ -59,7 +73,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setLoading(true);
       const res: AuthResponse = await apiLogin(email, password);
       await saveItem('token', res.token);
-      await saveItem('user', JSON.stringify(res.user));
+
+      //Sanitizar Usuarioconst sanitizedUser = sanitizeUser(res.user);
+      const sanitizedUser = sanitizeUser(res.user);
+      await saveItem('user', JSON.stringify(sanitizedUser));
+      //await saveItem('user', JSON.stringify(res.user));
       setUser(res.user);
       setError('');
     } catch (e: any) {
