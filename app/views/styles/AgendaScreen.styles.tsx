@@ -8,11 +8,11 @@ export const styles = StyleSheet.create({
     backgroundColor: '#f8f8f8',
   },
   content: {
-  flex: 1,
-  justifyContent: 'center',
-  alignItems: 'center',
-  gap: 16,
-},
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 16,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -36,14 +36,14 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     flex: 1,
   },
-    diasFila: {
+  diasFila: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     flex: 1,
     marginHorizontal: 8,
     marginBottom: 12,
-    },
-    diaCard: {
+  },
+  diaCard: {
     flex: 1,
     maxWidth: 56, // antes 48
     height: 160,
@@ -56,7 +56,24 @@ export const styles = StyleSheet.create({
     paddingTop: 8,
     backgroundColor: 'white',
     position: 'relative',
-    },
+  },
+  diaCardHoy: {
+    borderColor: '#aaa',
+    borderWidth: 1,
+    backgroundColor: '#f0f0f0',
+  },
+  diaCardSeleccionado: {
+    borderColor: '#ff4d4d',
+    borderWidth: 2,
+    backgroundColor: '#ffecec',
+    shadowColor: '#ff4d4d',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+
+
   diaNombre: {
     fontWeight: 'bold',
   },
@@ -113,15 +130,15 @@ export const styles = StyleSheet.create({
     marginTop: -2,
   },
   numeroWrapper: {
-  flex: 1,
-  justifyContent: 'center',
-  alignItems: 'center',
-},
-semanaHeader: {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  marginBottom: 12,
-},
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  semanaHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
 
 });
