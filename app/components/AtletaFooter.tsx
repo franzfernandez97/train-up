@@ -12,7 +12,7 @@ export default function AthleteFooter() {
       <TouchableOpacity onPress={() => navigation.navigate('Home')}>
         <Ionicons name="home" size={24} />
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate('Agenda')}>
+      <TouchableOpacity onPress={() => navigation.navigate('AgendaScreen')}>
         <MaterialCommunityIcons name="calendar-month-outline" size={24} />
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate('Progress')}>

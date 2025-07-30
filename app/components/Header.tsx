@@ -52,7 +52,10 @@ export default function Header() {
       </View>
       {/* Chat, Notificación, Logout */}
       <View style={styles.rightIcons}>
-        <TouchableOpacity style={styles.icon}>
+        <TouchableOpacity 
+          style={styles.icon}
+          onPress={()=> navigation.navigate('Chats')}
+          >
           <MaterialIcons name="chat-bubble-outline" size={24} />
         </TouchableOpacity>
 

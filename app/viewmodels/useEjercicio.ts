@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Ejercicio } from '../models/Ejercicio';
 import { getEjercicioById } from '../services/EjercicioService';
 
-export default function useEjercicioViewModel(ejercicioId: number) {
+export default function useEjercicio(ejercicioId: number) {
   const [ejercicio, setEjercicio] = useState<Ejercicio | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');

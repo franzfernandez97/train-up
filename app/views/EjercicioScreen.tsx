@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Dimensions, Platform, ScrollView, Text, View } from 'react-native';
 import RoleBasedLayout from '../components/RoleBasedLayout';
 import { RootStackParamList } from '../navigation/AppNavigator';
-import useEjercicioViewModel from '../viewmodels/useEjercicio';
+import useEjercicio from '../viewmodels/useEjercicio';
 import { styles } from './styles/EjercicioScreen.style';
 
 type EjercicioRouteProp = RouteProp<RootStackParamList, 'Ejercicio'>;
@@ -12,7 +12,7 @@ type EjercicioRouteProp = RouteProp<RootStackParamList, 'Ejercicio'>;
 export default function EjercicioScreen() {
   const route = useRoute<EjercicioRouteProp>();
   const { ejercicioId, rutinaId, seriesObjetivo, repObjetivo, descanso } = route.params;
-  const { ejercicio, loading, error } = useEjercicioViewModel(ejercicioId);
+  const { ejercicio, loading, error } = useEjercicio(ejercicioId);
   const [YoutubePlayer, setYoutubePlayer] = useState<React.ComponentType<any> | null>(null);
 
 
