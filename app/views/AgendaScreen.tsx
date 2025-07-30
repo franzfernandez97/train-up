@@ -75,7 +75,7 @@ export default function AgendaScreen() {
         </View>
 
         {/* Rutina asociada al día seleccionado */}
-        {diaSeleccionado && rutinaSeleccionada && (
+          {diaSeleccionado && rutinaSeleccionada && (
           <TouchableOpacity
             style={styles.rutinaCard}
             onPress={() =>
@@ -89,8 +89,10 @@ export default function AgendaScreen() {
               source={require('../assets/images/warning.png')}
               style={styles.iconoRutina}
             />
-            <View>
-              <Text style={styles.rutinaTitulo}>{rutinaSeleccionada.rutina.nombre}</Text>
+            <View style={styles.textoWrapper}>
+              <Text style={styles.rutinaTitulo} numberOfLines={2}>
+                {rutinaSeleccionada.rutina.nombre}
+              </Text>
               <Text style={styles.rutinaDescripcion}>
                 {rutinaSeleccionada.rutina.ejercicios?.length ?? 0} ejercicios
               </Text>

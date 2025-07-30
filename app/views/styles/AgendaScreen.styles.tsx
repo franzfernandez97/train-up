@@ -107,10 +107,12 @@ export const styles = StyleSheet.create({
   rutinaTitulo: {
     fontWeight: 'bold',
     fontSize: 16,
+    flexWrap: 'wrap',
   },
   rutinaDescripcion: {
     fontStyle: 'italic',
     fontSize: 13,
+    flexWrap: 'wrap',
   },
   botonFlotante: {
     position: 'absolute',
@@ -139,6 +141,10 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 12,
+  },
+  textoWrapper: {
+    flexShrink: 1,
+    flex: 1,
   },
 
 });
