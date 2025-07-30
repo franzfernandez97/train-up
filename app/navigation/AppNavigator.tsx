@@ -4,6 +4,7 @@ import { ActivityIndicator, View } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import { User } from '../models/User';
 import AgendaScreen from '../views/AgendaScreen';
+import CalendarioMensualScreen from '../views/CalendarioMensualScreen';
 import ChatScreen from '../views/ChatScreen';
 import ConversacionScreen from '../views/ConversacionScreen';
 import EditProfileScreen from '../views/EditProfileScreen';
@@ -35,7 +36,10 @@ export type RootStackParamList = {
   Chats: undefined;
   Conversacion: { usuario: User };
   SeleccionarUsuarioChatScreen: undefined;
-  AgendaScreen:undefined;
+  AgendaScreen: { fechaPreSeleccionada?: string };
+  CalendarioMensual: undefined;
+    
+
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -72,6 +76,7 @@ export default function AppNavigator() {
           <Stack.Screen name="Conversacion" component={ConversacionScreen} />
           <Stack.Screen name="SeleccionarUsuarioChatScreen" component={SeleccionarUsuarioChatScreen} />
           <Stack.Screen name="AgendaScreen" component={AgendaScreen} />
+          <Stack.Screen name="CalendarioMensual" component={CalendarioMensualScreen} />
         </>
       )}
     </Stack.Navigator>

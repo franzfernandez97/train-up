@@ -1,5 +1,6 @@
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import type { RouteProp } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
@@ -8,9 +9,12 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import useAgendaViewModel from '../viewmodels/useAgenda';
 import { styles } from './styles/AgendaScreen.styles';
 
+type AgendaRouteProp = RouteProp<RootStackParamList, 'AgendaScreen'>;
 
 export default function AgendaScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const route = useRoute<AgendaRouteProp>();
+
   const {
     dias,
     tituloSemana,
@@ -19,7 +23,7 @@ export default function AgendaScreen() {
     setDiaSeleccionado,
     diaSeleccionado,
     rutinaSeleccionada,
-  } = useAgendaViewModel();
+  } = useAgendaViewModel(route.params?.fechaPreSeleccionada); // ✅ Se pasa directamente aquí
 
   return (
     <RoleBasedLayout>
@@ -27,7 +31,7 @@ export default function AgendaScreen() {
         {/* Título */}
         <View style={styles.header}>
           <Text style={styles.title}>Agenda</Text>
-          <TouchableOpacity onPress={() => console.log('Abrir calendario')}>
+          <TouchableOpacity onPress={() => navigation.navigate('CalendarioMensual')}>
             <FontAwesome name="calendar" size={24} color="#ff4d4d" />
           </TouchableOpacity>
         </View>
@@ -72,9 +76,9 @@ export default function AgendaScreen() {
 
         {/* Rutina asociada al día seleccionado */}
         {diaSeleccionado && rutinaSeleccionada && (
-          <TouchableOpacity 
-          style={styles.rutinaCard}
-          onPress={() =>
+          <TouchableOpacity
+            style={styles.rutinaCard}
+            onPress={() =>
               navigation.navigate('RutinaDetalle', {
                 rutinaId: rutinaSeleccionada.rutina.id,
                 rutinaNombre: rutinaSeleccionada.rutina.nombre,
@@ -87,7 +91,9 @@ export default function AgendaScreen() {
             />
             <View>
               <Text style={styles.rutinaTitulo}>{rutinaSeleccionada.rutina.nombre}</Text>
-              <Text style={styles.rutinaDescripcion}>{rutinaSeleccionada.rutina.ejercicios?.length ?? 0}</Text>
+              <Text style={styles.rutinaDescripcion}>
+                {rutinaSeleccionada.rutina.ejercicios?.length ?? 0} ejercicios
+              </Text>
             </View>
           </TouchableOpacity>
         )}
