@@ -1,15 +1,18 @@
 import axios from 'axios';
-import { Ejercicio } from '../models/Ejercicio';
+import { RutinaEjercicio } from '../models/RutinaEjercicio';
 import { getItem } from '../utils/SecureStorage';
 
 const API_URL = 'http://147.93.114.243:8080/api';
 
+
 /**
- * Obtiene los ejercicios asociados a una rutina específica
+ * Obtiene los ejercicios asociados a una rutina específica.
  * @param rutinaId ID de la rutina
- * @returns Lista de ejercicios
+ * @returns Lista de RutinaEjercicio
  */
-export const fetchEjerciciosPorRutina = async (rutinaId: number): Promise<Ejercicio[]> => {
+export const fetchEjerciciosPorRutina = async (
+  rutinaId: number
+): Promise<RutinaEjercicio[]> => {
   try {
     const token = await getItem('token');
     const response = await axios.get(`${API_URL}/rutina-ejercicios/rutina/${rutinaId}`, {
@@ -19,10 +22,12 @@ export const fetchEjerciciosPorRutina = async (rutinaId: number): Promise<Ejerci
       },
     });
 
-    // El backend responde con { message: string, data: Ejercicio[] }
+    // La respuesta del backend es { message: string, data: RutinaEjercicio[] }
     return response.data.data;
   } catch (error: any) {
-    const msg = error?.response?.data?.message ?? 'Error al obtener ejercicios de la rutina';
+    const msg =
+      error?.response?.data?.message ??
+      'Error al obtener los ejercicios de la rutina';
     throw new Error(msg);
   }
 };

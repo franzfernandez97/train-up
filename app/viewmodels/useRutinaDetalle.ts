@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Ejercicio } from '../models/Ejercicio';
+import { RutinaEjercicio } from '../models/RutinaEjercicio';
 import { fetchEjerciciosPorRutina } from '../services/RutinaEjercicioService';
 
 export default function useRutinaDetalleViewModel(rutinaId: number) {
-  const [ejercicios, setEjercicios] = useState<Ejercicio[]>([]);
+  const [rutinaEjercicios, setRutinaEjercicios] = useState<RutinaEjercicio[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -11,9 +11,10 @@ export default function useRutinaDetalleViewModel(rutinaId: number) {
     try {
       setLoading(true);
       const data = await fetchEjerciciosPorRutina(rutinaId);
-      setEjercicios(data);
+      setRutinaEjercicios(data);
+      setError('');
     } catch (e: any) {
-      setError(e.message);
+      setError(e.message ?? 'Error al cargar ejercicios');
     } finally {
       setLoading(false);
     }
@@ -23,5 +24,10 @@ export default function useRutinaDetalleViewModel(rutinaId: number) {
     load();
   }, [rutinaId]);
 
-  return { ejercicios, loading, error, reload: load };
+  return {
+    rutinaEjercicios, // 🔄 Ahora contiene todo (objetivo, descanso, comentario y objeto ejercicio)
+    loading,
+    error,
+    reload: load,
+  };
 }

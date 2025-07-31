@@ -21,3 +21,21 @@ export const fetchRutinas = async (): Promise<Rutina[]> => {
     throw new Error(msg);
   }
 };
+
+export const fetchRutinaDetalle = async (id: number): Promise<Rutina> => {
+  try {
+    const token = await getItem('token');
+    const response = await axios.get(`${API_URL}/rutinas/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    // El backend retorna { message: string, data: Rutina }
+    return response.data.data;
+  } catch (error: any) {
+    const msg = error?.response?.data?.message ?? 'Error al obtener el detalle de la rutina';
+    throw new Error(msg);
+  }
+};
