@@ -9,6 +9,7 @@ import ChatScreen from '../views/ChatScreen';
 import ConversacionScreen from '../views/ConversacionScreen';
 import EditProfileScreen from '../views/EditProfileScreen';
 import EjercicioScreen from '../views/EjercicioScreen';
+import EntrenamientoScreen from '../views/EntrenamientoScreen';
 import HomeScreen from '../views/HomeScreen';
 import LoginScreen from '../views/LoginScreen';
 import RegisterScreen from '../views/RegisterScreen';
@@ -21,10 +22,11 @@ export type RootStackParamList = {
   Home: undefined;
   SignUp: undefined;
   EditProfile: undefined;
-  Rutinas: undefined;
+  Rutinas: { fechaPreSeleccionada?: string };
   RutinaDetalle: { 
     rutinaId: number; 
-    rutinaNombre: string 
+    rutinaNombre: string;
+    fechaPreSeleccionada?: string;
   };
   Ejercicio: {
     rutinaId: number;
@@ -38,7 +40,7 @@ export type RootStackParamList = {
   SeleccionarUsuarioChatScreen: undefined;
   AgendaScreen: { fechaPreSeleccionada?: string };
   CalendarioMensual: undefined;
-    
+  Entrenamiento: { rutinaId: number };
 
 };
 
@@ -77,6 +79,7 @@ export default function AppNavigator() {
           <Stack.Screen name="SeleccionarUsuarioChatScreen" component={SeleccionarUsuarioChatScreen} />
           <Stack.Screen name="AgendaScreen" component={AgendaScreen} />
           <Stack.Screen name="CalendarioMensual" component={CalendarioMensualScreen} />
+          <Stack.Screen name="Entrenamiento" component={EntrenamientoScreen} />
         </>
       )}
     </Stack.Navigator>

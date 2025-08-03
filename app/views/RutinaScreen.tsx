@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React from 'react';
 import {
@@ -16,19 +16,25 @@ import { styles } from './styles/RutinaScreen.style';
 
 export default function RutinasScreen() {
   const { rutinas, loading, error } = useRutinasViewModel();
+  const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+  type RutaScreenRouteProp = RouteProp<RootStackParamList, 'Rutinas'>;
+  const route = useRoute<RutaScreenRouteProp>();
+  const fechaPreSeleccionada = route.params?.fechaPreSeleccionada;
 
   const renderItem = ({ item }: any) => (
     <TouchableOpacity
       style={styles.card}
-      onPress={() =>
+      onPress={() => {
+        console.log("fecha preSeleccionada en RutinaScreen:", fechaPreSeleccionada);
         navigation.navigate('RutinaDetalle', {
           rutinaId: item.id,
           rutinaNombre: item.nombre,
-        })
-      }
+          ...(fechaPreSeleccionada && { fechaPreSeleccionada }),
+        });
+      }}
+
     >
       <Ionicons
         name="clipboard-outline"

@@ -41,3 +41,32 @@ export const getTodasLasRutinasAsignadas = async (): Promise<AtletaRutina[]> => 
     return [];
   }
 };
+
+/**
+ * Crea una nueva asignación de rutina para un atleta.
+ */
+export const createAtletaRutina = async (
+  atleta_id: number,
+  rutina_id: number,
+  dia: string,
+  frecuencia: string = '1'
+): Promise<void> => {
+  try {
+    const token = await getItem('token');
+
+    await axios.post(
+      `${API_URL}/atleta-rutinas`,
+      { atleta_id, rutina_id, dia, frecuencia },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+  } catch (error: any) {
+    const msg = error?.response?.data?.message ?? 'Error al crear la rutina asignada';
+    console.error(msg);
+    throw new Error(msg);
+  }
+};

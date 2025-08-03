@@ -87,18 +87,17 @@ export const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 4,
   },
-  rutinaCard: {
-    marginTop: 8,
-    padding: 12,
-    marginBottom: 160,
-    borderWidth: 1,
-    borderColor: '#000',
-    borderRadius: 8,
-    backgroundColor: '#fff',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
+rutinaCard: {
+  marginTop: 8,
+  padding: 12,
+  borderWidth: 1,
+  borderColor: '#000',
+  borderRadius: 8,
+  backgroundColor: '#fff',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 12,
+},
   iconoRutina: {
     width: 32,
     height: 32,
@@ -146,5 +145,8 @@ export const styles = StyleSheet.create({
     flexShrink: 1,
     flex: 1,
   },
-
+rutinaListaContainer: {
+  paddingBottom: 100, // espacio para botón flotante
+  gap: 16,
+},
 });

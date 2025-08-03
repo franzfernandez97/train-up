@@ -20,11 +20,12 @@ type RutinaDetalleRouteProp = RouteProp<RootStackParamList, 'RutinaDetalle'>;
 
 export default function RutinaDetalleScreen() {
   const route = useRoute<RutinaDetalleRouteProp>();
-  const { rutinaId, rutinaNombre } = route.params;
+  const { rutinaId, rutinaNombre, fechaPreSeleccionada } = route.params;
   const [expanded, setExpanded] = useState<number | null>(null);
   const { rutinaEjercicios, loading, error } = useRutinaDetalleViewModel(rutinaId);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-
+  const { iniciarEntrenamiento } = useRutinaDetalleViewModel(rutinaId);
+  console.log("Fecha PreSeleccionada:",fechaPreSeleccionada)
   const renderItem = ({ item }: { item: RutinaEjercicio }) => (
     <View style={styles.card}>
       {/* Columna 1: Logo */}
@@ -125,7 +126,18 @@ export default function RutinaDetalleScreen() {
           contentContainerStyle={styles.list}
         />
 
-        <TouchableOpacity style={styles.startButton}>
+        <TouchableOpacity
+          style={styles.startButton}
+          onPress={async () => {
+            try {
+              await iniciarEntrenamiento(fechaPreSeleccionada);
+              navigation.navigate('Entrenamiento', { rutinaId });
+            } catch (error: any) {
+              console.error('Error al iniciar entrenamiento:', error.message);
+              // Opcional: showAlert('Error', error.message);
+            }
+          }}
+        >
           <Text style={styles.startButtonText}>Iniciar Entrenamiento</Text>
         </TouchableOpacity>
       </View>

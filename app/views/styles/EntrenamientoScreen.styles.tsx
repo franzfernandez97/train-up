@@ -2,64 +2,74 @@ import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   container: {
-    flex: 1,
     padding: 16,
-    backgroundColor: '#f4f4f4'
+    paddingBottom: 32,
+    backgroundColor: '#fff',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 12,
-    textAlign: 'center'
+    marginBottom: 16,
   },
   card: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ccc',
+    backgroundColor: '#f5f5f5',
     borderRadius: 12,
     padding: 12,
-    marginBottom: 16
+    marginBottom: 16,
   },
-  header: {
+  cardHeader: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    justifyContent: 'space-between'
+    marginBottom: 8,
   },
-  image: {
-    width: 60,
-    height: 60
-  },
-  playIcon: {
-    position: 'absolute',
-    top: 8,
-    left: 8
-  },
-  nombre: {
+  exerciseTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '600',
+  },
+  videoRow: {
+    flexDirection: 'row',
+    gap: 12,
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  textCol: {
     flex: 1,
-    marginLeft: 12
+    gap: 4,
   },
-  subInfo: {
-    marginTop: 6
-  },
-  insertarMarcas: {
+  infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 12
+    gap: 6,
   },
-  insertarTexto: {
-    marginLeft: 6
+  infoText: {
+    fontSize: 14,
+    flexShrink: 1,
   },
-  botonCompletar: {
-    backgroundColor: '#d0f0d0',
-    padding: 8,
-    borderRadius: 6,
-    alignSelf: 'flex-end',
-    marginTop: 10
+  actionsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 8,
   },
-  textoCompletar: {
-    color: 'green',
-    fontWeight: 'bold'
-  }
+  btnGray: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#e0e0e0',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  btnCheck: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  btnText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
 });

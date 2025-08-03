@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AtletaRutina } from '../models/AtletaRutina';
-import { getTodasLasRutinasAsignadas } from '../services/AtletaRutinaService';
+import { getRutinasAsignadasPorDia, getTodasLasRutinasAsignadas } from '../services/AtletaRutinaService';
 
 export interface DiaSemana {
   label: string;
@@ -14,13 +14,13 @@ export interface DiaSemana {
 export default function useAgenda(fechaInicial?: string) {
   const hoy = new Date();
 
-    function parseISOToLocalDate(isoString: string): Date {
+  function parseISOToLocalDate(isoString: string): Date {
     const [year, month, day] = isoString.split('-').map(Number);
     return new Date(year, month - 1, day);
-    }
+  }
 
-const fechaDesdeProp = fechaInicial ? parseISOToLocalDate(fechaInicial) : hoy;
-const fechaIsoInicial = fechaDesdeProp.toISOString().split('T')[0];
+  const fechaDesdeProp = fechaInicial ? parseISOToLocalDate(fechaInicial) : hoy;
+  const fechaIsoInicial = fechaDesdeProp.toISOString().split('T')[0];
 
   const [dias, setDias] = useState<DiaSemana[]>([]);
   const [tituloSemana, setTituloSemana] = useState('');
@@ -28,6 +28,7 @@ const fechaIsoInicial = fechaDesdeProp.toISOString().split('T')[0];
   const [diaSeleccionado, setDiaSeleccionado] = useState<string>(fechaIsoInicial);
   const [rutinas, setRutinas] = useState<AtletaRutina[]>([]);
   const [rutinaSeleccionada, setRutinaSeleccionada] = useState<AtletaRutina | null>(null);
+  const [rutinasDelDia, setRutinasDelDia] = useState<AtletaRutina[]>([]); // ✅ NUEVO
 
   // ✅ Cargar todas las rutinas una vez
   useEffect(() => {
@@ -43,10 +44,27 @@ const fechaIsoInicial = fechaDesdeProp.toISOString().split('T')[0];
     fetchRutinas();
   }, []);
 
-  // ✅ Generar la semana cuando cambia fecha base, día o rutinas
+  // ✅ Actualizar semana cuando cambia fecha base o rutinas
   useEffect(() => {
     generarSemanaDesdeFecha(fechaBase, diaSeleccionado);
   }, [fechaBase, diaSeleccionado, rutinas]);
+
+  // ✅ Consultar rutinas del día seleccionado al cambiar
+  useEffect(() => {
+    const fetchRutinasDelDia = async () => {
+      try {
+        const data = await getRutinasAsignadasPorDia(diaSeleccionado);
+        setRutinasDelDia(data);
+      } catch (error) {
+        console.error('❌ Error al obtener rutinas del día:', error);
+        setRutinasDelDia([]);
+      }
+    };
+
+    if (diaSeleccionado) {
+      fetchRutinasDelDia();
+    }
+  }, [diaSeleccionado]);
 
   const generarSemanaDesdeFecha = (
     fechaReferencia: Date,
@@ -80,7 +98,6 @@ const fechaIsoInicial = fechaDesdeProp.toISOString().split('T')[0];
 
       const esSeleccionado = fechaIso === diaSeleccionadoParam;
 
-
       return {
         label,
         dia: fechaDia.getDate(),
@@ -95,7 +112,6 @@ const fechaIsoInicial = fechaDesdeProp.toISOString().split('T')[0];
 
     const encontrada = rutinas.find(r => r.dia === diaSeleccionadoParam);
     setRutinaSeleccionada(encontrada ?? null);
-
   };
 
   const irSemanaAnterior = () => {
@@ -119,6 +135,7 @@ const fechaIsoInicial = fechaDesdeProp.toISOString().split('T')[0];
     diaSeleccionado,
     setDiaSeleccionado,
     rutinaSeleccionada,
+    rutinasDelDia, // ✅ EXPUESTO
     irSemanaAnterior,
     irSemanaSiguiente,
   };

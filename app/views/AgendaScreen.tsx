@@ -3,7 +3,7 @@ import type { RouteProp } from '@react-navigation/native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import RoleBasedLayout from '../components/RoleBasedLayout';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import useAgendaViewModel from '../viewmodels/useAgenda';
@@ -22,8 +22,8 @@ export default function AgendaScreen() {
     irSemanaSiguiente,
     setDiaSeleccionado,
     diaSeleccionado,
-    rutinaSeleccionada,
-  } = useAgendaViewModel(route.params?.fechaPreSeleccionada); // ✅ Se pasa directamente aquí
+    rutinasDelDia,
+  } = useAgendaViewModel(route.params?.fechaPreSeleccionada);
 
   return (
     <RoleBasedLayout>
@@ -74,36 +74,47 @@ export default function AgendaScreen() {
           ))}
         </View>
 
-        {/* Rutina asociada al día seleccionado */}
-          {diaSeleccionado && rutinaSeleccionada && (
-          <TouchableOpacity
-            style={styles.rutinaCard}
-            onPress={() =>
-              navigation.navigate('RutinaDetalle', {
-                rutinaId: rutinaSeleccionada.rutina.id,
-                rutinaNombre: rutinaSeleccionada.rutina.nombre,
-              })
-            }
-          >
-            <Image
-              source={require('../assets/images/warning.png')}
-              style={styles.iconoRutina}
-            />
-            <View style={styles.textoWrapper}>
-              <Text style={styles.rutinaTitulo} numberOfLines={2}>
-                {rutinaSeleccionada.rutina.nombre}
-              </Text>
-              <Text style={styles.rutinaDescripcion}>
-                {rutinaSeleccionada.rutina.ejercicios?.length ?? 0} ejercicios
-              </Text>
-            </View>
-          </TouchableOpacity>
-        )}
+        {/* Rutinas del día seleccionado */}
+        {/* Rutinas del día seleccionado */}
+        <View style={{ flex: 1 }}>
+          <ScrollView contentContainerStyle={styles.rutinaListaContainer}>
+            {diaSeleccionado && rutinasDelDia.length > 0 &&
+              rutinasDelDia.map((rutinaAsignada, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.rutinaCard}
+                  onPress={() =>
+                    navigation.navigate('RutinaDetalle', {
+                      rutinaId: rutinaAsignada.rutina.id,
+                      rutinaNombre: rutinaAsignada.rutina.nombre,
+                      fechaPreSeleccionada: diaSeleccionado,
+                    })
+                  }
+                >
+                  <Image
+                    source={require('../assets/images/warning.png')}
+                    style={styles.iconoRutina}
+                  />
+                  <View style={styles.textoWrapper}>
+                    <Text style={styles.rutinaTitulo} numberOfLines={2}>
+                      {rutinaAsignada.rutina.nombre}
+                    </Text>
+                    <Text style={styles.rutinaDescripcion}>
+                      {rutinaAsignada.rutina.ejercicios?.length ?? 0} ejercicios
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+          </ScrollView>
+        </View>
 
-        {/* Botón flotante */}
         <TouchableOpacity
           style={styles.botonFlotante}
-          onPress={() => navigation.navigate('Rutinas')}
+          onPress={() =>
+            navigation.navigate('Rutinas', {
+              fechaPreSeleccionada: diaSeleccionado, // ✅ se pasa la fecha actual
+            })
+          }
         >
           <Text style={styles.botonIcono}>＋</Text>
         </TouchableOpacity>
