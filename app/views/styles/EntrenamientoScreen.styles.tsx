@@ -72,4 +72,11 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
   },
+  videoBox: {
+    width: '100%',
+    borderRadius: 10,
+    overflow: 'hidden',
+    backgroundColor: '#000',
+    marginTop: 8, // debajo del título
+  },
 });
