@@ -1,4 +1,5 @@
 import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native'; // 👈 importar hook de navegación
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -6,19 +7,32 @@ import {
   Platform,
   ScrollView,
   Text,
-  View
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import RoleBasedLayout from '../components/RoleBasedLayout';
 import { RutinaEjercicio } from '../models/RutinaEjercicio';
+import { showAlert, showConfirm } from '../utils/AlertService';
 import useEntrenamiento from '../viewmodels/useEntrenamiento';
 import { styles } from './styles/EntrenamientoScreen.styles';
 
 export default function EntrenamientoScreen() {
-  const { nombreRutina, ejercicios, loading, completados, toggleCompletar } = useEntrenamiento();
-  const [YoutubePlayer, setYoutubePlayer] = useState<React.ComponentType<any> | null>(null);
+  const {
+    nombreRutina,
+    ejercicios,
+    loading,
+    completados,
+    toggleCompletar,
+    handleFinalizar,
+  } = useEntrenamiento();
 
-  // Medidas por tarjeta: id -> { w, h } para 16:9
+  const navigation = useNavigation<any>(); // 👈 inicializar hook
+
+  const [YoutubePlayer, setYoutubePlayer] = useState<React.ComponentType<any> | null>(null);
   const [dims, setDims] = useState<Record<number, { w: number; h: number }>>({});
+  const [marcasVisibles, setMarcasVisibles] = useState<Record<number, boolean>>({});
+  const [marcas, setMarcas] = useState<Record<number, { repeticiones: string; peso: string }[]>>({});
 
   useEffect(() => {
     if (Platform.OS !== 'web') {
@@ -29,6 +43,61 @@ export default function EntrenamientoScreen() {
   const getYoutubeId = (url: string): string => {
     const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([^&\n?#]+)/);
     return match?.[1] ?? '';
+  };
+
+  // ========= Helpers marcas =========
+  const toNumeric = (s: string) => s.replace(/[^\d.,-]/g, '');
+
+  const ensureMarcas = (id: number, series: number) => {
+    setMarcas((prev) => {
+      if (prev[id]?.length === series) return prev;
+      return {
+        ...prev,
+        [id]: Array.from({ length: series }, () => ({ repeticiones: '', peso: '' })),
+      };
+    });
+  };
+
+  const toggleMarcas = (id: number, series: number) => {
+    ensureMarcas(id, series);
+    setMarcasVisibles((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const updateMarca = (
+    id: number,
+    index: number,
+    field: 'repeticiones' | 'peso',
+    value: string
+  ) => {
+    setMarcas((prev) => {
+      const arr = prev[id] ? [...prev[id]] : [];
+      if (!arr[index]) return prev;
+      arr[index] = { ...arr[index], [field]: toNumeric(value) };
+      return { ...prev, [id]: arr };
+    });
+  };
+  // ==================================
+
+  // 🔹 Acción finalizar: confirmación + llamada al VM + navegación
+  const onFinalizarPress = () => {
+    showConfirm(
+      'Finalizar entrenamiento',
+      '¿Deseas guardar tus marcas? Las series vacías se ignorarán',
+      async () => {
+        try {
+          const resp = await handleFinalizar(marcas);
+          // resp: { ok: true, resumen: Array<{ ejercicio_id, marca_personal_id, seriesCreadas }> }
+          showAlert(
+            '¡Entrenamiento finalizado!',
+            `Se registraron ${resp.resumen.reduce((acc, r) => acc + r.seriesCreadas, 0)} series.`
+          );
+          // 👇 Navegar a Home inmediatamente
+          navigation.navigate('Home');
+        } catch (e: any) {
+          showAlert('Error', e?.message ?? 'No se pudo finalizar el entrenamiento.');
+        }
+      }
+    );
   };
 
   if (loading) {
@@ -54,8 +123,8 @@ export default function EntrenamientoScreen() {
           const completado = completados.includes(id);
           const videoId = getYoutubeId(ejercicio.urlMedia);
 
-          const playerW = dims[id]?.w ?? Math.min(screenW - 32, screenW); // fallback razonable
-          const playerH = dims[id]?.h ?? Math.round(playerW * 9 / 16);
+          const playerW = dims[id]?.w ?? Math.min(screenW - 32, screenW);
+          const playerH = dims[id]?.h ?? Math.round((playerW * 9) / 16);
 
           return (
             <View key={id} style={styles.card}>
@@ -64,10 +133,8 @@ export default function EntrenamientoScreen() {
                 <MaterialIcons name="insights" size={20} />
               </View>
 
-              {/* 🔹 VIDEO INLINE: justo debajo del título, ancho 100% de la tarjeta */}
               <View
                 style={styles.videoBox}
-                // Medimos el ancho real disponible de la tarjeta para calcular 16:9
                 onLayout={(e) => {
                   const w = e.nativeEvent.layout.width;
                   if (!w) return;
@@ -76,7 +143,6 @@ export default function EntrenamientoScreen() {
                 }}
               >
                 {Platform.OS === 'web' ? (
-                  // Web: iframe ocupa el 100% del contenedor (ya controlamos alto con 'local.videoBox' + dims)
                   <iframe
                     style={{ width: '100%', height: playerH, border: 0 }}
                     src={`https://www.youtube.com/embed/${videoId}?playsinline=1`}
@@ -85,29 +151,19 @@ export default function EntrenamientoScreen() {
                     allowFullScreen
                   />
                 ) : YoutubePlayer ? (
-                  // Native: el player usa dims medidos, reproduce inline con controles
                   <YoutubePlayer
                     width={playerW}
                     height={playerH}
                     videoId={videoId}
-                    play={false} // el usuario pulsa Play en el mismo player
-                    initialPlayerParams={{
-                      controls: true,
-                      modestbranding: true,
-                      rel: false,
-                      // playsinline se respeta en WebView interno
-                    }}
-                    webViewProps={{
-                      allowsFullscreenVideo: true, // el usuario puede agrandar desde el control del player
-                      androidLayerType: 'hardware',
-                    }}
+                    play={false}
+                    initialPlayerParams={{ controls: true, modestbranding: true, rel: false }}
+                    webViewProps={{ allowsFullscreenVideo: true, androidLayerType: 'hardware' }}
                   />
                 ) : (
                   <Text style={{ color: '#999', padding: 8 }}>Cargando video…</Text>
                 )}
               </View>
 
-              {/* INFO */}
               <View style={styles.textCol}>
                 <View style={styles.infoRow}>
                   <FontAwesome5 name="flag" size={14} />
@@ -129,30 +185,81 @@ export default function EntrenamientoScreen() {
                 )}
               </View>
 
-              {/* ACCIONES */}
               <View style={styles.actionsRow}>
-                <View style={styles.btnGray}>
-                  <Ionicons name="add-circle-outline" size={18} />
-                  <Text style={styles.btnText}>Insertar marcas</Text>
-                </View>
+                <TouchableOpacity style={styles.btnGray} onPress={() => toggleMarcas(id, seriesObjetivo)}>
+                  <Ionicons
+                    name={marcasVisibles[id] ? 'remove-circle-outline' : 'add-circle-outline'}
+                    size={18}
+                  />
+                  <Text style={styles.btnText}>
+                    {marcasVisibles[id] ? 'Ocultar marcas' : 'Insertar marcas'}
+                  </Text>
+                </TouchableOpacity>
 
-                <View
-                  style={[
-                    styles.btnCheck,
-                    { backgroundColor: completado ? '#4CAF50' : '#ccc' },
-                  ]}
-                  // si quieres mantener tu toggle:
-                  // onTouchEnd={() => toggleCompletar(id)}
+                <TouchableOpacity
+                  style={[styles.btnCheck, { backgroundColor: completado ? '#4CAF50' : '#ccc' }]}
+                  onPress={() => toggleCompletar(id)}
                 >
                   <Ionicons name="checkmark-done-outline" size={18} color="#000" />
                   <Text style={styles.btnText}>Completar</Text>
-                </View>
+                </TouchableOpacity>
               </View>
+
+              {marcasVisibles[id] && (
+                <View style={styles.marksContainer}>
+                  <View style={styles.marksHeaderRow}>
+                    <View style={styles.marksColSeries}>
+                      <Text style={styles.marksHeaderText}>Series</Text>
+                    </View>
+                    <View style={styles.marksColReps}>
+                      <Text style={styles.marksHeaderText}>Repeticiones</Text>
+                    </View>
+                    <View style={styles.marksCol}>
+                      <Text style={styles.marksHeaderText}>Peso (lb)</Text>
+                    </View>
+                  </View>
+
+                  {marcas[id]?.map((m, idx) => (
+                    <View key={idx} style={styles.marksRow}>
+                      <View style={styles.marksColSeries}>
+                        <Text style={styles.marksSeriesText}>{idx + 1}</Text>
+                      </View>
+
+                      <View style={styles.marksCol}>
+                        <TextInput
+                          style={styles.marksInput}
+                          value={m.repeticiones}
+                          placeholder="0"
+                          inputMode="numeric"
+                          keyboardType="numeric"
+                          onChangeText={(t) => updateMarca(id, idx, 'repeticiones', t)}
+                        />
+                      </View>
+
+                      <View style={styles.marksCol}>
+                        <TextInput
+                          style={styles.marksInput}
+                          value={m.peso}
+                          placeholder="0"
+                          inputMode="decimal"
+                          keyboardType="numeric"
+                          onChangeText={(t) => updateMarca(id, idx, 'peso', t)}
+                        />
+                      </View>
+                    </View>
+                  ))}
+                </View>
+              )}
             </View>
           );
         })}
+
+        {/* 🔹 ÚNICO botón al final del scroll */}
+        <TouchableOpacity style={styles.finishButton} onPress={onFinalizarPress} activeOpacity={0.85}>
+          <Ionicons name="stop-circle-outline" size={20} color="#fff" />
+          <Text style={styles.finishButtonText}>Finalizar Entrenamiento</Text>
+        </TouchableOpacity>
       </ScrollView>
     </RoleBasedLayout>
   );
 }
-

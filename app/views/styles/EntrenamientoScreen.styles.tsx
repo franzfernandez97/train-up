@@ -79,4 +79,68 @@ export const styles = StyleSheet.create({
     backgroundColor: '#000',
     marginTop: 8, // debajo del título
   },
+  // --- 👇 NUEVOS estilos para Marcas ---
+  marksContainer: {
+    marginTop: 12,
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: '#f2f2f2',
+  },
+  marksHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  marksHeaderText: {
+    fontWeight: '600',
+  },
+  marksRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 6,
+  },
+  marksColSeries: {
+    width: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 6,
+  },
+  marksSeriesText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  marksCol: {
+    flex: 1,
+    paddingHorizontal: 6,
+  },
+  marksColReps: {
+    flex: 1.6,   // más ancho que las demás
+    paddingHorizontal: 6,
+  },
+  marksInput: {
+    borderWidth: 1,
+    borderColor: '#222',
+    borderRadius: 6,
+    backgroundColor: '#fff',
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    fontSize: 16,
+  },
+  //Boton finalizacion de entrenamiento
+  finishButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#e53935', // rojo, puedes cambiarlo
+    paddingVertical: 14,
+    borderRadius: 8,
+    marginTop: 20,
+  },
+  finishButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 8,
+  },
+
 });
