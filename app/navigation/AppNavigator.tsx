@@ -12,6 +12,7 @@ import EjercicioScreen from '../views/EjercicioScreen';
 import EntrenamientoScreen from '../views/EntrenamientoScreen';
 import HomeScreen from '../views/HomeScreen';
 import LoginScreen from '../views/LoginScreen';
+import MetricsScreen from '../views/MetricsScreen';
 import RegisterScreen from '../views/RegisterScreen';
 import RutinaDetalleScreen from '../views/RutinaDetalleScreen';
 import RutinasScreen from '../views/RutinaScreen';
@@ -41,6 +42,7 @@ export type RootStackParamList = {
   AgendaScreen: { fechaPreSeleccionada?: string };
   CalendarioMensual: undefined;
   Entrenamiento: { rutinaId: number };
+  Metrics: { ejercicio_id?: number };
 
 };
 
@@ -80,6 +82,7 @@ export default function AppNavigator() {
           <Stack.Screen name="AgendaScreen" component={AgendaScreen} />
           <Stack.Screen name="CalendarioMensual" component={CalendarioMensualScreen} />
           <Stack.Screen name="Entrenamiento" component={EntrenamientoScreen} />
+          <Stack.Screen name="Metrics" component={MetricsScreen} />
         </>
       )}
     </Stack.Navigator>
