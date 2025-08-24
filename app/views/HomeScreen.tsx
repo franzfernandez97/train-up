@@ -3,6 +3,7 @@ import { Text, View } from 'react-native';
 import RoleBasedLayout from '../components/RoleBasedLayout';
 import { useAuth } from '../contexts/AuthContext';
 import HomeAtleta from './home/HomeAtleta';
+import HomeEntrenador from './home/HomeEntrenador';
 import { styles } from './styles/HomeScreen.styles';
 
 export default function HomeScreen() {
@@ -16,8 +17,8 @@ export default function HomeScreen() {
     switch (user?.role) {
       case 'atleta':
         return <HomeAtleta />;
-      // case 'entrenador':
-      //   return <HomeEntrenador />;
+      case 'entrenador':
+        return <HomeEntrenador />;
       // case 'admin':
       //   return <HomeAdmin />;
       default:

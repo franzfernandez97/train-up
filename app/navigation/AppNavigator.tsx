@@ -23,7 +23,7 @@ export type RootStackParamList = {
   Home: undefined;
   SignUp: undefined;
   EditProfile: undefined;
-  Rutinas: { fechaPreSeleccionada?: string };
+  Rutinas: undefined | { fechaPreSeleccionada?: string };
   RutinaDetalle: { 
     rutinaId: number; 
     rutinaNombre: string;

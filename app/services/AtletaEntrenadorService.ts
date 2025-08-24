@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { User } from '../models/User';
+import type { User } from '../models/User';
 import { getItem } from '../utils/SecureStorage';
 
 const API_URL = 'http://147.93.114.243:8080/api';
@@ -15,7 +15,13 @@ export const getUsuariosRelacionados = async (): Promise<User[]> => {
       },
     });
 
-    return response.data.data ?? [];
+    const data = response?.data?.data;
+    if (!Array.isArray(data)) {
+      console.error('[AtletaEntrenadorService] Estructura inesperada:', response?.data);
+      throw new Error('Estructura inesperada del backend');
+    }
+    console.log(data)
+    return data as User[];
   } catch (error) {
     console.error('Error al obtener usuarios relacionados', error);
     return [];
