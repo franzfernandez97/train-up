@@ -33,8 +33,10 @@ export default function HomeEntrenador() {
               <TouchableOpacity
                 style={styles.card}
                 onPress={() => {
-                  // navigation.navigate('AsignarRutina', { atletaId: item.atleta_id });
-                  console.log('Abrir detalle de atleta', item.atleta_id);
+                    navigation.navigate('AgendaScreen', {
+                    atletaId: item.atleta_id,     // ← clave para modo entrenador
+                    atletaNombre: item.nombre,    // ← opcional: para mostrar en el título
+                    });
                 }}
               >
                 <View style={styles.avatarWrap}>

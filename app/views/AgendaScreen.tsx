@@ -15,6 +15,10 @@ export default function AgendaScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<AgendaRouteProp>();
 
+  // 👇 Nuevo: lee los params opcionales (modo entrenador)
+  const atletaId = route.params?.atletaId;
+  const atletaNombre = route.params?.atletaNombre;
+
   const {
     dias,
     tituloSemana,
@@ -23,15 +27,21 @@ export default function AgendaScreen() {
     setDiaSeleccionado,
     diaSeleccionado,
     rutinasDelDia,
-  } = useAgendaViewModel(route.params?.fechaPreSeleccionada);
+  } = useAgendaViewModel(route.params?.fechaPreSeleccionada, atletaId); // 👈 pasa atletaId opcional
 
   return (
     <RoleBasedLayout>
       <View style={styles.container}>
         {/* Título */}
         <View style={styles.header}>
-          <Text style={styles.title}>Agenda</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('CalendarioMensual')}>
+          <Text style={styles.title}>
+            Agenda{atletaNombre ? ` — ${atletaNombre}` : ''}
+          </Text>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('CalendarioMensual', atletaId ? { atletaId } : undefined)
+            }
+          >
             <FontAwesome name="calendar" size={24} color="#ff4d4d" />
           </TouchableOpacity>
         </View>
@@ -75,7 +85,6 @@ export default function AgendaScreen() {
         </View>
 
         {/* Rutinas del día seleccionado */}
-        {/* Rutinas del día seleccionado */}
         <View style={{ flex: 1 }}>
           <ScrollView contentContainerStyle={styles.rutinaListaContainer}>
             {diaSeleccionado && rutinasDelDia.length > 0 &&
@@ -88,6 +97,7 @@ export default function AgendaScreen() {
                       rutinaId: rutinaAsignada.rutina.id,
                       rutinaNombre: rutinaAsignada.rutina.nombre,
                       fechaPreSeleccionada: diaSeleccionado,
+                      atletaId, // 👈 mantiene contexto del atleta (si aplica)
                     })
                   }
                 >
@@ -112,7 +122,8 @@ export default function AgendaScreen() {
           style={styles.botonFlotante}
           onPress={() =>
             navigation.navigate('Rutinas', {
-              fechaPreSeleccionada: diaSeleccionado, // ✅ se pasa la fecha actual
+              fechaPreSeleccionada: diaSeleccionado,
+              atletaId, // 👈 para planificar al atleta seleccionado (modo entrenador)
             })
           }
         >

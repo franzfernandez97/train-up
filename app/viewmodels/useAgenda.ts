@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AtletaRutina } from '../models/AtletaRutina';
 import { getRutinasAsignadasPorDia, getTodasLasRutinasAsignadas } from '../services/AtletaRutinaService';
 
@@ -11,16 +11,22 @@ export interface DiaSemana {
   esSeleccionado: boolean;
 }
 
-export default function useAgenda(fechaInicial?: string) {
-  const hoy = new Date();
+// ✅ helper seguro para YYYY-MM-DD en zona local (evita desfases con toISOString)
+function toYMDLocal(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+function parseYMDLocal(ymd: string): Date {
+  const [y, m, d] = ymd.split('-').map(Number);
+  return new Date(y, (m ?? 1) - 1, d ?? 1);
+}
 
-  function parseISOToLocalDate(isoString: string): Date {
-    const [year, month, day] = isoString.split('-').map(Number);
-    return new Date(year, month - 1, day);
-  }
-
-  const fechaDesdeProp = fechaInicial ? parseISOToLocalDate(fechaInicial) : hoy;
-  const fechaIsoInicial = fechaDesdeProp.toISOString().split('T')[0];
+export default function useAgenda(fechaInicial?: string, atletaId?: number) {
+  const hoy = useMemo(() => new Date(), []);
+  const fechaDesdeProp = fechaInicial ? parseYMDLocal(fechaInicial) : hoy;
+  const fechaIsoInicial = toYMDLocal(fechaDesdeProp);
 
   const [dias, setDias] = useState<DiaSemana[]>([]);
   const [tituloSemana, setTituloSemana] = useState('');
@@ -28,48 +34,47 @@ export default function useAgenda(fechaInicial?: string) {
   const [diaSeleccionado, setDiaSeleccionado] = useState<string>(fechaIsoInicial);
   const [rutinas, setRutinas] = useState<AtletaRutina[]>([]);
   const [rutinaSeleccionada, setRutinaSeleccionada] = useState<AtletaRutina | null>(null);
-  const [rutinasDelDia, setRutinasDelDia] = useState<AtletaRutina[]>([]); // ✅ NUEVO
+  const [rutinasDelDia, setRutinasDelDia] = useState<AtletaRutina[]>([]);
 
-  // ✅ Cargar todas las rutinas una vez
+  // ✅ Cargar todas las rutinas (del atleta autenticado o del atleta seleccionado por entrenador)
   useEffect(() => {
+    let mounted = true;
     const fetchRutinas = async () => {
       try {
-        const data = await getTodasLasRutinasAsignadas();
-        setRutinas(data);
+        const data = await getTodasLasRutinasAsignadas(atletaId);
+        if (mounted) setRutinas(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error('❌ Error al cargar rutinas:', error);
+        if (mounted) setRutinas([]);
       }
     };
-
     fetchRutinas();
-  }, []);
+    return () => { mounted = false; };
+  }, [atletaId]);
 
-  // ✅ Actualizar semana cuando cambia fecha base o rutinas
+  // ✅ Actualizar semana cuando cambia fecha base, seleccionado o rutinas
   useEffect(() => {
     generarSemanaDesdeFecha(fechaBase, diaSeleccionado);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fechaBase, diaSeleccionado, rutinas]);
 
-  // ✅ Consultar rutinas del día seleccionado al cambiar
+  // ✅ Consultar rutinas del día seleccionado (filtrando por atletaId si viene)
   useEffect(() => {
+    let mounted = true;
     const fetchRutinasDelDia = async () => {
       try {
-        const data = await getRutinasAsignadasPorDia(diaSeleccionado);
-        setRutinasDelDia(data);
+        const data = await getRutinasAsignadasPorDia(diaSeleccionado, atletaId);
+        if (mounted) setRutinasDelDia(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error('❌ Error al obtener rutinas del día:', error);
-        setRutinasDelDia([]);
+        if (mounted) setRutinasDelDia([]);
       }
     };
+    if (diaSeleccionado) fetchRutinasDelDia();
+    return () => { mounted = false; };
+  }, [diaSeleccionado, atletaId]);
 
-    if (diaSeleccionado) {
-      fetchRutinasDelDia();
-    }
-  }, [diaSeleccionado]);
-
-  const generarSemanaDesdeFecha = (
-    fechaReferencia: Date,
-    diaSeleccionadoParam: string
-  ) => {
+  const generarSemanaDesdeFecha = (fechaReferencia: Date, diaSeleccionadoParam: string) => {
     const fecha = new Date(fechaReferencia); // copia segura
     const diaSemana = (fecha.getDay() + 6) % 7; // Lunes=0
 
@@ -79,30 +84,23 @@ export default function useAgenda(fechaInicial?: string) {
     const domingo = new Date(lunes);
     domingo.setDate(lunes.getDate() + 6);
 
-    const mesAnio = lunes.toLocaleDateString('es-ES', {
-      month: 'long',
-      year: 'numeric',
-    });
+    const mesAnio = lunes.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+    setTituloSemana(`${capitalizeFirst(mesAnio)} - Semana ${lunes.getDate()} al ${domingo.getDate()}`);
 
-    setTituloSemana(
-      `${capitalizeFirst(mesAnio)} - Semana ${lunes.getDate()} al ${domingo.getDate()}`
-    );
-
-    const hoyIso = hoy.toISOString().split('T')[0];
+    const hoyIso = toYMDLocal(hoy);
     const etiquetas = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
 
     const nuevosDias: DiaSemana[] = etiquetas.map((label, i) => {
       const fechaDia = new Date(lunes);
       fechaDia.setDate(lunes.getDate() + i);
-      const fechaIso = fechaDia.toISOString().split('T')[0];
-
+      const fechaIso = toYMDLocal(fechaDia);
       const esSeleccionado = fechaIso === diaSeleccionadoParam;
 
       return {
         label,
         dia: fechaDia.getDate(),
         fechaCompleta: fechaIso,
-        tieneRutina: rutinas.some(r => r.dia === fechaIso),
+        tieneRutina: rutinas.some((r) => r.dia === fechaIso),
         esHoy: fechaIso === hoyIso,
         esSeleccionado,
       };
@@ -110,8 +108,8 @@ export default function useAgenda(fechaInicial?: string) {
 
     setDias(nuevosDias);
 
-    const encontrada = rutinas.find(r => r.dia === diaSeleccionadoParam);
-    setRutinaSeleccionada(encontrada ?? null);
+    const encontrada = rutinas.find((r) => r.dia === diaSeleccionadoParam) ?? null;
+    setRutinaSeleccionada(encontrada);
   };
 
   const irSemanaAnterior = () => {
@@ -135,7 +133,7 @@ export default function useAgenda(fechaInicial?: string) {
     diaSeleccionado,
     setDiaSeleccionado,
     rutinaSeleccionada,
-    rutinasDelDia, // ✅ EXPUESTO
+    rutinasDelDia,
     irSemanaAnterior,
     irSemanaSiguiente,
   };

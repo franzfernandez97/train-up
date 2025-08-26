@@ -22,6 +22,7 @@ export default function RutinasScreen() {
   type RutaScreenRouteProp = RouteProp<RootStackParamList, 'Rutinas'>;
   const route = useRoute<RutaScreenRouteProp>();
   const fechaPreSeleccionada = route.params?.fechaPreSeleccionada;
+  const atletaId = route.params?.atletaId;
 
   const renderItem = ({ item }: any) => (
     <TouchableOpacity
@@ -32,6 +33,7 @@ export default function RutinasScreen() {
           rutinaId: item.id,
           rutinaNombre: item.nombre,
           ...(fechaPreSeleccionada && { fechaPreSeleccionada }),
+          ...(typeof atletaId === 'number' ? { atletaId } : {}), // 👈 pasa atletaId si vino
         });
       }}
 

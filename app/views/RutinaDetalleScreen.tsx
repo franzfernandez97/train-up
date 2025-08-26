@@ -11,8 +11,10 @@ import {
   View,
 } from 'react-native';
 import RoleBasedLayout from '../components/RoleBasedLayout';
+import { useAuth } from '../contexts/AuthContext';
 import { RutinaEjercicio } from '../models/RutinaEjercicio';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import { showAlert } from '../utils/AlertService';
 import useRutinaDetalleViewModel from '../viewmodels/useRutinaDetalle';
 import { styles } from './styles/RutinaDetalleScreen.style';
 
@@ -20,12 +22,18 @@ type RutinaDetalleRouteProp = RouteProp<RootStackParamList, 'RutinaDetalle'>;
 
 export default function RutinaDetalleScreen() {
   const route = useRoute<RutinaDetalleRouteProp>();
-  const { rutinaId, rutinaNombre, fechaPreSeleccionada } = route.params;
-  const [expanded, setExpanded] = useState<number | null>(null);
-  const { rutinaEjercicios, loading, error } = useRutinaDetalleViewModel(rutinaId);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const { iniciarEntrenamiento } = useRutinaDetalleViewModel(rutinaId);
-  console.log("Fecha PreSeleccionada:",fechaPreSeleccionada)
+
+  const { rutinaId, rutinaNombre, fechaPreSeleccionada, atletaId } = route.params;
+  const { user } = useAuth();
+  const isEntrenador = user?.role?.toLowerCase?.() === 'entrenador';
+
+  // Llama al hook una sola vez y desestructura todo
+  const { rutinaEjercicios, loading, error, iniciarEntrenamiento } =
+    useRutinaDetalleViewModel(rutinaId);
+
+  const [expanded, setExpanded] = useState<number | null>(null);
+
   const renderItem = ({ item }: { item: RutinaEjercicio }) => (
     <View style={styles.card}>
       {/* Columna 1: Logo */}
@@ -42,10 +50,7 @@ export default function RutinaDetalleScreen() {
           })
         }
       >
-        <Image
-          source={require('../assets/images/logo.png')}
-          style={styles.leftIcon}
-        />
+        <Image source={require('../assets/images/logo.png')} style={styles.leftIcon} />
       </TouchableOpacity>
 
       {/* Columna 2: Nombre + datos */}
@@ -62,9 +67,7 @@ export default function RutinaDetalleScreen() {
           })
         }
       >
-        <Text style={styles.title}>
-          {item.ejercicio?.nombre ?? 'Ejercicio sin nombre'}
-        </Text>
+        <Text style={styles.title}>{item.ejercicio?.nombre ?? 'Ejercicio sin nombre'}</Text>
         <Text style={styles.subtitle}>Series: {item.seriesObjetivo}</Text>
         <Text style={styles.subtitle}>Repeticiones: {item.repObjetivo}</Text>
         <Text style={styles.subtitle}>Descanso: {item.descanso} seg</Text>
@@ -102,17 +105,35 @@ export default function RutinaDetalleScreen() {
           })
         }
       >
-        <Ionicons
-          name="information-circle-outline"
-          size={24}
-          style={styles.infoIcon}
-        />
+        <Ionicons name="information-circle-outline" size={24} style={styles.infoIcon} />
       </TouchableOpacity>
     </View>
   );
 
   if (loading) return <ActivityIndicator style={{ marginTop: 20 }} />;
   if (error) return <Text style={{ color: 'red' }}>{error}</Text>;
+
+  const onStartPress = async () => {
+    try {
+      if (isEntrenador) {
+        if (typeof atletaId !== 'number') {
+          showAlert('Falta información', 'No se recibió el atleta para crear el entrenamiento.');
+          return;
+        }
+        // Crear entrenamiento para el atleta seleccionado (mantén el texto exacto/fecha si aplica)
+        await iniciarEntrenamiento(fechaPreSeleccionada, atletaId);
+        // Para entrenador: volver a Home
+        navigation.navigate('Home');
+      } else {
+        // Atleta: iniciar y navegar a pantalla de entrenamiento
+        await iniciarEntrenamiento(fechaPreSeleccionada);
+        navigation.navigate('Entrenamiento', { rutinaId });
+      }
+    } catch (e: any) {
+      console.error('Error al iniciar/crear entrenamiento:', e?.message || e);
+      showAlert('Error', e?.message ?? 'No fue posible iniciar/crear el entrenamiento.');
+    }
+  };
 
   return (
     <RoleBasedLayout>
@@ -126,19 +147,10 @@ export default function RutinaDetalleScreen() {
           contentContainerStyle={styles.list}
         />
 
-        <TouchableOpacity
-          style={styles.startButton}
-          onPress={async () => {
-            try {
-              await iniciarEntrenamiento(fechaPreSeleccionada);
-              navigation.navigate('Entrenamiento', { rutinaId });
-            } catch (error: any) {
-              console.error('Error al iniciar entrenamiento:', error.message);
-              // Opcional: showAlert('Error', error.message);
-            }
-          }}
-        >
-          <Text style={styles.startButtonText}>Iniciar Entrenamiento</Text>
+        <TouchableOpacity style={styles.startButton} onPress={onStartPress}>
+          <Text style={styles.startButtonText}>
+            {isEntrenador ? 'Crear Entrenamiento' : 'Iniciar Entrenamiento'}
+          </Text>
         </TouchableOpacity>
       </View>
     </RoleBasedLayout>

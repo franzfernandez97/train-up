@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import type { RouteProp } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React from 'react';
 import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
@@ -8,9 +9,17 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import useCalendarioMensualViewModel from '../viewmodels/useCalendarioMensual';
 import { styles } from './styles/CalendarioMensualScreen.styles';
 
+type CalendarioRouteProp = RouteProp<RootStackParamList, 'CalendarioMensual'>;
+
 export default function CalendarioMensualScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const { diasMes, mesActual, cambiarMes, numeroFilas } = useCalendarioMensualViewModel();
+  const route = useRoute<CalendarioRouteProp>();
+
+  // 👇 atletaId opcional (modo entrenador). Si no viene, funciona para el atleta autenticado.
+  const atletaId = route.params?.atletaId;
+
+  const { diasMes, mesActual, cambiarMes, numeroFilas } =
+    useCalendarioMensualViewModel(atletaId);
 
   const nombreMes = mesActual.toLocaleDateString('es-ES', {
     month: 'long',
@@ -18,12 +27,15 @@ export default function CalendarioMensualScreen() {
   });
 
   const handleSeleccionarDia = (fecha: string) => {
-    navigation.navigate('AgendaScreen', { fechaPreSeleccionada: fecha });
+    navigation.navigate('AgendaScreen', {
+      fechaPreSeleccionada: fecha,
+      ...(atletaId ? { atletaId } : {}), // ← mantiene el contexto del atleta si aplica
+    });
   };
 
-  // Calcular altura dinámica para que el calendario se vea completo
+  // Altura dinámica para el grid
   const { height: alturaPantalla } = Dimensions.get('window');
-  const alturaDisponible = alturaPantalla - 200; // Espacio restante para el grid (header + márgenes)
+  const alturaDisponible = alturaPantalla - 200;
   const alturaFila = alturaDisponible / numeroFilas;
 
   return (
@@ -34,7 +46,9 @@ export default function CalendarioMensualScreen() {
           <TouchableOpacity onPress={() => cambiarMes(-1)}>
             <Ionicons name="chevron-back" size={24} />
           </TouchableOpacity>
-          <Text style={styles.headerText}>{nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1)}</Text>
+          <Text style={styles.headerText}>
+            {nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1)}
+          </Text>
           <TouchableOpacity onPress={() => cambiarMes(1)}>
             <Ionicons name="chevron-forward" size={24} />
           </TouchableOpacity>
@@ -49,20 +63,19 @@ export default function CalendarioMensualScreen() {
           {/* Días del mes */}
           {diasMes.map((item, idx) => (
             <TouchableOpacity
-                key={idx}
-                style={[
+              key={idx}
+              style={[
                 styles.dia,
                 { height: alturaFila },
-                !item.esDelMes && styles.diaFueraMes, // nuevo estilo
+                !item.esDelMes && styles.diaFueraMes,
                 item.tieneRutina && styles.diaConRutina,
                 item.esHoy && styles.diaHoy,
-                ]}
-                onPress={() => handleSeleccionarDia(item.fecha)}
+              ]}
+              onPress={() => handleSeleccionarDia(item.fecha)}
             >
-                <Text>{item.dia}</Text>
+              <Text>{item.dia}</Text>
             </TouchableOpacity>
-            ))}
-
+          ))}
         </View>
       </View>
     </RoleBasedLayout>

@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { AtletaRutina } from '../models/AtletaRutina';
 import { getRutinasAsignadasPorDia } from '../services/AtletaRutinaService';
 
-export default function useAtletaRutinas() {
+export default function useAtletaRutinas(atletaId?: number) {
   const [rutinas, setRutinas] = useState<AtletaRutina[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -14,22 +14,29 @@ export default function useAtletaRutinas() {
     return `${year}-${month}-${day}`;
   }
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const hoy = getLocalDateString();
-        const data = await getRutinasAsignadasPorDia(hoy);
-        setRutinas(data);
-      } catch (e) {
-        console.error('Error al cargar rutinas del día:', e);
-      } finally {
-        setLoading(false);
-      }
+  const fetchData = useCallback(async () => {
+    let mounted = true;
+    try {
+      setLoading(true);
+      const hoy = getLocalDateString();
+      const data = await getRutinasAsignadasPorDia(hoy, atletaId); // ← atletaId opcional
+      if (mounted) setRutinas(Array.isArray(data) ? data : []);
+    } catch (e) {
+      console.error('Error al cargar rutinas del día:', e);
+      if (mounted) setRutinas([]);
+    } finally {
+      if (mounted) setLoading(false);
+    }
+    return () => {
+      mounted = false;
     };
+  }, [atletaId]);
 
+  useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
+  const refresh = () => fetchData();
 
-  return { rutinas, loading };
+  return { rutinas, loading, refresh };
 }
