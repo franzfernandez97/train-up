@@ -20,3 +20,20 @@ export const getEjercicioById = async (id: number): Promise<Ejercicio | null> =>
     return null;
   }
 };
+
+export const getAllEjercicios = async (): Promise<Ejercicio[]> => {
+  try {
+    const token = await getItem('token');
+    const response = await axios.get(`${API_URL}/ejercicios`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    // Backend: { message: string, data: Ejercicio[] }
+    return response.data?.data ?? [];
+  } catch (error: any) {
+    const msg = error?.response?.data?.message ?? 'Error al obtener los ejercicios';
+    throw new Error(msg);
+  }
+};

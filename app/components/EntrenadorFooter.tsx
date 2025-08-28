@@ -14,7 +14,7 @@ export default function TrainerFooter() {
         <Text style={styles.label}>Home</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate('Rutinas')}>
+      <TouchableOpacity onPress={() => navigation.navigate('RutinaGestion')}>
         <MaterialCommunityIcons name="clipboard-text-outline" size={24} />
         <Text style={styles.label}>Rutinas</Text>
       </TouchableOpacity>

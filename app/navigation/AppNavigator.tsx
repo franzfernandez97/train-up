@@ -25,6 +25,7 @@ import LoginScreen from '../views/LoginScreen';
 import MetricsScreen from '../views/MetricsScreen';
 import RegisterScreen from '../views/RegisterScreen';
 import RutinaDetalleScreen from '../views/RutinaDetalleScreen';
+import RutinaGestionScreen from '../views/RutinaGestionScreen';
 import RutinasScreen from '../views/RutinaScreen';
 import SeleccionarUsuarioChatScreen from '../views/SeleccionarUsuarioChatScreen';
 
@@ -42,11 +43,7 @@ export type RootStackParamList = {
   Home: undefined;
   EditProfile: undefined;
 
-  /**
-   * Listado de rutinas disponibles para asignar/usar.
-   * - Atleta: sin params
-   * - Entrenador: puede pasar `atletaId` y `fechaPreSeleccionada`
-   */
+  // Listado de rutinas (asignar/usar)
   Rutinas:
     | undefined
     | {
@@ -54,10 +51,7 @@ export type RootStackParamList = {
         atletaId?: number;
       };
 
-  /**
-   * Detalle de una rutina específica.
-   * - `atletaId?` mantiene el contexto si viene desde entrenador
-   */
+  // Detalle de rutina
   RutinaDetalle: {
     rutinaId: number;
     rutinaNombre: string;
@@ -65,9 +59,7 @@ export type RootStackParamList = {
     atletaId?: number;
   };
 
-  /**
-   * Pantalla de un ejercicio dentro de una rutina.
-   */
+  // Ejercicio dentro de una rutina
   Ejercicio: {
     rutinaId: number;
     ejercicioId: number;
@@ -81,11 +73,7 @@ export type RootStackParamList = {
   Conversacion: { usuario: User };
   SeleccionarUsuarioChatScreen: undefined;
 
-  /**
-   * Agenda semanal:
-   * - Atleta: sin params
-   * - Entrenador: puede pasar `atletaId` y `atletaNombre`
-   */
+  // Agenda semanal
   AgendaScreen:
     | undefined
     | {
@@ -94,34 +82,29 @@ export type RootStackParamList = {
         atletaNombre?: string;
       };
 
-  /**
-   * Calendario mensual:
-   * - Puede recibir `atletaId` para ver el mes de un atleta específico
-   */
+  // Calendario mensual
   CalendarioMensual:
     | undefined
     | {
         atletaId?: number;
       };
 
-  /**
-   * Entrenamiento en curso (solo atleta)
-   */
+  // Gestión de rutinas (solo entrenadores; la pantalla valida el rol)
+  RutinaGestion: undefined;
+
+  // Entrenamiento en curso (solo atleta)
   Entrenamiento: { rutinaId: number };
 
-  /**
-   * Métricas / estadísticas
-   */
+  // Métricas / estadísticas
   Metrics: { ejercicio_id?: number };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function AppNavigator() {
-  // Estado de autenticación y carga inicial
   const { user, initializing } = useAuth();
 
-  // Mientras carga usuario desde SecureStorage
+  // Cargando usuario desde SecureStorage
   if (initializing) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -131,18 +114,13 @@ export default function AppNavigator() {
   }
 
   return (
-    <Stack.Navigator
-      // Oculta el header por defecto (cada pantalla puede mostrarlo si lo necesita)
-      screenOptions={{ headerShown: false }}
-    >
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       {!user ? (
-        // 👉 Usuario NO autenticado: solo Login/Registro
         <>
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="SignUp" component={RegisterScreen} />
         </>
       ) : (
-        // 👉 Usuario autenticado: resto de pantallas
         <>
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="EditProfile" component={EditProfileScreen} />
@@ -156,6 +134,9 @@ export default function AppNavigator() {
           {/* Agenda y Calendario */}
           <Stack.Screen name="AgendaScreen" component={AgendaScreen} />
           <Stack.Screen name="CalendarioMensual" component={CalendarioMensualScreen} />
+
+          {/* Gestión de rutinas (entrenadores) */}
+          <Stack.Screen name="RutinaGestion" component={RutinaGestionScreen} />
 
           {/* Chat */}
           <Stack.Screen name="Chats" component={ChatScreen} />
