@@ -14,6 +14,7 @@ import { User } from '../models/User';
 
 // Vistas
 import AgendaScreen from '../views/AgendaScreen';
+import AIScreen from '../views/AIScreen';
 import CalendarioMensualScreen from '../views/CalendarioMensualScreen';
 import ChatScreen from '../views/ChatScreen';
 import ConversacionScreen from '../views/ConversacionScreen';
@@ -44,6 +45,9 @@ export type RootStackParamList = {
   Home: undefined;
   EditProfile: undefined;
 
+  // IA (solo atletas; la vista valida el rol)
+  AI: undefined;
+  
   // Listado de rutinas (asignar/usar)
   Rutinas:
     | undefined
@@ -134,6 +138,9 @@ export default function AppNavigator() {
           <Stack.Screen name="RutinaDetalle" component={RutinaDetalleScreen} />
           <Stack.Screen name="Ejercicio" component={EjercicioScreen} />
           <Stack.Screen name="Entrenamiento" component={EntrenamientoScreen} />
+
+          {/* Pantalla AI */}
+          <Stack.Screen name="AI" component={AIScreen} />
 
           {/* Agenda y Calendario */}
           <Stack.Screen name="AgendaScreen" component={AgendaScreen} />
