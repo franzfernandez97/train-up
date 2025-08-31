@@ -19,7 +19,7 @@ export default function TrainerFooter() {
         <Text style={styles.label}>Rutinas</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate('Ejercicios')}>
+      <TouchableOpacity onPress={() => navigation.navigate('EjercicioGestion')}>
         <MaterialCommunityIcons name="dumbbell" size={24} />
         <Text style={styles.label}>Ejercicios</Text>
       </TouchableOpacity>

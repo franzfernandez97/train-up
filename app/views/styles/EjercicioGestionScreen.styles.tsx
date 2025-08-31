@@ -1,0 +1,203 @@
+import { StyleSheet } from 'react-native';
+
+export const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingHorizontal: 12,
+    paddingTop: 12,
+  },
+  header: {
+    fontSize: 22,
+    fontWeight: '700',
+    marginBottom: 8,
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 8,
+  },
+
+  // 🔎 filtros
+  filtersBlock: {
+    gap: 8,
+    marginBottom: 10,
+  },
+  searchBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    height: 40,
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 1 },
+  },
+  searchIcon: {
+    marginRight: 6,
+    color: '#666',
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 14,
+    paddingVertical: 6,
+  },
+
+  // 🫧 ¿burbujas/grupos
+  chipsRow: {
+    paddingVertical: 2,
+  },
+  chipBubble: {
+    marginRight: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 999,
+    backgroundColor: '#f2f2f2',
+    borderWidth: 1,
+    borderColor: '#e5e5e5',
+  },
+  chipBubbleActive: {
+    backgroundColor: '#E8F1FF',
+    borderColor: '#A7C7FF',
+  },
+  chipBubbleText: {
+    fontSize: 13,
+    color: '#333',
+    fontWeight: '600',
+  },
+  chipBubbleTextActive: {
+    color: '#0A5FFF',
+  },
+  pickerWrapper: {
+    width: 160,
+    height: 40,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    overflow: 'hidden',
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 1 },
+    justifyContent: 'center',
+  },
+  picker: {
+    height: 40,
+    width: '100%',
+  },
+
+  listContent: {
+    paddingBottom: 120,
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 12,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  chip: {
+    alignSelf: 'flex-start',
+    fontSize: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 999,
+    backgroundColor: '#f2f2f2',
+    color: '#333',
+    marginBottom: 10,
+  },
+  videoContainer: {
+    width: '100%',
+    height: 220,
+    borderRadius: 8,
+    overflow: 'hidden',
+    backgroundColor: '#000',
+    marginBottom: 12,
+  },
+  iframeWrapper: {
+    height: '100%',
+    width: '100%',
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  videoPlaceholder: {
+    color: '#ccc',
+    textAlign: 'center',
+    marginTop: 90,
+  },
+  instructionsBlock: {
+    backgroundColor: '#fafafa',
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 10,
+  },
+  subHeader: {
+    fontSize: 14,
+    fontWeight: '700',
+    marginBottom: 6,
+  },
+  instructionLine: {
+    fontSize: 13,
+    lineHeight: 18,
+    marginBottom: 4,
+  },
+  actionsRow: {
+    flexDirection: 'row',
+    gap: 10,
+    justifyContent: 'flex-end',
+    marginTop: 6,
+  },
+  editBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#e8f1ff',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  deleteBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#ffecec',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  actionText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  emptyText: {
+    textAlign: 'center',
+    color: '#666',
+    paddingVertical: 20,
+  },
+  fab: {
+    position: 'absolute',
+    right: 18,
+    bottom: 28,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#007AFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOpacity: 0.18,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+  },
+});

@@ -18,6 +18,7 @@ import CalendarioMensualScreen from '../views/CalendarioMensualScreen';
 import ChatScreen from '../views/ChatScreen';
 import ConversacionScreen from '../views/ConversacionScreen';
 import EditProfileScreen from '../views/EditProfileScreen';
+import EjercicioGestionScreen from '../views/EjercicioGestionScreen';
 import EjercicioScreen from '../views/EjercicioScreen';
 import EntrenamientoScreen from '../views/EntrenamientoScreen';
 import HomeScreen from '../views/HomeScreen';
@@ -68,6 +69,9 @@ export type RootStackParamList = {
     descanso: string;
   };
 
+  //gestión de ejercicios
+  EjercicioGestion: undefined;
+  
   // Mensajería
   Chats: undefined;
   Conversacion: { usuario: User };
@@ -137,6 +141,9 @@ export default function AppNavigator() {
 
           {/* Gestión de rutinas (entrenadores) */}
           <Stack.Screen name="RutinaGestion" component={RutinaGestionScreen} />
+
+          {/* Gestión deejercicios (entrenadores) */}
+          <Stack.Screen name="EjercicioGestion" component={EjercicioGestionScreen} />
 
           {/* Chat */}
           <Stack.Screen name="Chats" component={ChatScreen} />
