@@ -46,8 +46,13 @@ export type RootStackParamList = {
   EditProfile: undefined;
 
   // IA (solo atletas; la vista valida el rol)
-  AI: undefined;
-  
+  // ⬇️ Ahora puede recibir la fecha cuando volvemos desde CalendarioMensual
+  AI:
+    | undefined
+    | {
+        fechaPreSeleccionada?: string;
+      };
+
   // Listado de rutinas (asignar/usar)
   Rutinas:
     | undefined
@@ -73,9 +78,9 @@ export type RootStackParamList = {
     descanso: string;
   };
 
-  //gestión de ejercicios
+  // Gestión de ejercicios (entrenadores)
   EjercicioGestion: undefined;
-  
+
   // Mensajería
   Chats: undefined;
   Conversacion: { usuario: User };
@@ -91,10 +96,14 @@ export type RootStackParamList = {
       };
 
   // Calendario mensual
+  // ⬇️ Añadimos parámetros opcionales para “modo retorno”
   CalendarioMensual:
     | undefined
     | {
         atletaId?: number;
+        returnTo?: keyof RootStackParamList;   // p.ej. 'AI'
+        returnParamName?: string;              // default: 'fechaPreSeleccionada'
+        returnExtra?: Record<string, any>;
       };
 
   // Gestión de rutinas (solo entrenadores; la pantalla valida el rol)
@@ -141,6 +150,7 @@ export default function AppNavigator() {
 
           {/* Pantalla AI */}
           <Stack.Screen name="AI" component={AIScreen} />
+          
 
           {/* Agenda y Calendario */}
           <Stack.Screen name="AgendaScreen" component={AgendaScreen} />
@@ -149,7 +159,7 @@ export default function AppNavigator() {
           {/* Gestión de rutinas (entrenadores) */}
           <Stack.Screen name="RutinaGestion" component={RutinaGestionScreen} />
 
-          {/* Gestión deejercicios (entrenadores) */}
+          {/* Gestión de ejercicios (entrenadores) */}
           <Stack.Screen name="EjercicioGestion" component={EjercicioGestionScreen} />
 
           {/* Chat */}

@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   container: { padding: 16 },
@@ -68,4 +68,8 @@ export const styles = StyleSheet.create({
   modalBtnPrimary: { backgroundColor: '#111' },
   modalBtnTextSecondary: { color: '#111', fontWeight: '700' },
   modalBtnTextPrimary: { color: '#fff', fontWeight: '700' },
+  jsonBox: { maxHeight: 200, padding: 10, backgroundColor: '#111', borderRadius: 8 },
+  jsonText: { color: '#0f0', fontFamily: Platform.select({ ios: 'Menlo', android: 'monospace' }), fontSize: 12 },
+  modalBtnMini: { paddingHorizontal: 10, paddingVertical: 6, backgroundColor: '#eee', borderRadius: 8 },
+  modalBtnMiniText: { color: '#333', fontWeight: '600' },
 });

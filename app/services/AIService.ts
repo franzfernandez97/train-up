@@ -1,5 +1,5 @@
-// /services/AiService.ts
-import axios from 'axios';
+// /services/AIService.ts
+import axios, { AxiosError } from 'axios';
 import { Ejercicio } from '../models/Ejercicio';
 import { Rutina } from '../models/Rutina';
 import { getItem } from '../utils/SecureStorage';
@@ -14,21 +14,22 @@ export const NIVELES = ['principiante','intermedio','avanzado'] as const;
 export type Nivel = typeof NIVELES[number];
 
 export const GRUPOS = [
-  'Abdominales','Pierna','Gluteo',
+  'Calentamiento','Funcional','Abdominales','Pierna','Gluteo',
   'Espalda','Pecho','Hombro','Biceps','Triceps','Antebrazo'
 ] as const;
 export type GrupoMuscular = typeof GRUPOS[number];
 
-// ======== Tipos de solicitud/respuesta ========
+// ======== Tipos de solicitud ========
 export type GenerarRutinaAIRequest = {
   objetivo: Objetivo;
-  dia?: string;                       // opcional (backend usa hoy si falta)
+  dia?: string;                     // opcional (backend usa hoy si falta)
   nivel: Nivel;
-  grupoMuscular: GrupoMuscular[];     // multi-selección
-  duracion: number;                   // 10..180
-  atleta_id?: number;                 // opcional (si un entrenador genera para otro)
+  grupoMuscular: GrupoMuscular[];   // multi-selección
+  duracion: number;                 // 10..180
+  atleta_id?: number;               // opcional (si un entrenador genera para otro)
 };
 
+// ======== Tipos de respuesta de éxito ========
 export type RutinaEjercicio = {
   id: number;
   rutina_id: number;
@@ -42,19 +43,72 @@ export type RutinaEjercicio = {
   ejercicio: Ejercicio;
 };
 
+export type PlannerCalcDebug = {
+  objetivoEj?: number;
+  series?: number;
+  descanso?: number;
+};
+export type PlannerServiceDebug = {
+  correlation_id?: string;
+  calc?: PlannerCalcDebug;
+  reparto?: Record<string, number>;
+};
+
+export type DebugAI = {
+  planner_input?: any;
+  violations?: string[];
+  ai_plan?: Array<any> | null;
+  razonamiento?: string;
+  service_debug?: PlannerServiceDebug;
+};
+
 export type GenerarRutinaAIResponse = {
   message: string; // "Rutina AI generada correctamente"
   data: {
-    rutina: Rutina;                     // incluye ejercicios: Ejercicio[]
+    rutina: Rutina;
     rutina_ejercicios: RutinaEjercicio[];
     explicacion_ai?: string | null;
   };
+  // el backend también envía debug_ai en éxito
+  debug_ai?: DebugAI;
 };
 
-// ======== Helper común (idéntico patrón) ========
+// ======== Tipos de respuesta de error (backend) ========
+export type BackendErrorResponse = {
+  message?: string;
+  error?: {
+    message?: string;
+    status?: number | null;
+    body?: any;
+  };
+  debug_ai?: DebugAI;
+};
+
+// ======== Error enriquecido para MVVM/UI ========
+export class AiServiceError extends Error {
+  status?: number;
+  body?: any;
+  debugAI?: DebugAI;
+  isBackend: boolean;
+
+  constructor(msg: string, opts?: { status?: number; body?: any; debugAI?: DebugAI; isBackend?: boolean }) {
+    super(msg);
+    this.name = 'AiServiceError';
+    this.status = opts?.status;
+    this.body = opts?.body;
+    this.debugAI = opts?.debugAI;
+    this.isBackend = Boolean(opts?.isBackend);
+  }
+
+  get correlationId(): string | undefined {
+    return this.debugAI?.service_debug?.correlation_id;
+  }
+}
+
+// ======== Helper común ========
 const authHeaders = async () => {
   const token = await getItem('token');
-  if (!token) throw new Error('No se encontró un token de autenticación.');
+  if (!token) throw new AiServiceError('No se encontró un token de autenticación.', { isBackend: false });
   return {
     Authorization: `Bearer ${token}`,
     'Content-Type': 'application/json',
@@ -74,28 +128,69 @@ const ensureYMD = (d?: string) => {
   return `${yyyy}-${mm}-${dd}`;
 };
 
+// ======== Detectores & helpers para la VM ========
+export const isGenerarRutinaAIResponse = (x: any): x is GenerarRutinaAIResponse =>
+  x && typeof x === 'object' && 'data' in x && 'rutina' in x.data;
+
+export const getCorrelationId = (x?: { debug_ai?: DebugAI } | AiServiceError): string | undefined => {
+  if (!x) return undefined;
+  if (x instanceof AiServiceError) return x.correlationId;
+  return x.debug_ai?.service_debug?.correlation_id;
+};
+
+// Normaliza el error de Axios → AiServiceError enriquecido
+const normalizeAxiosError = (err: AxiosError): AiServiceError => {
+  const status = err.response?.status;
+  const data = err.response?.data as BackendErrorResponse | string | undefined;
+
+  // Backend envía JSON con { message, error?, debug_ai? }
+  if (data && typeof data === 'object') {
+    const be = data as BackendErrorResponse;
+    const msg =
+      be.message ||
+      be.error?.message ||
+      (typeof err.message === 'string' ? err.message : 'Fallo en la solicitud');
+    return new AiServiceError(msg, {
+      status: be.error?.status ?? status,
+      body: be.error?.body,
+      debugAI: be.debug_ai,
+      isBackend: true,
+    });
+  }
+
+  // Texto plano o sin respuesta (network, CORS, timeout)
+  const fallbackMsg =
+    typeof data === 'string'
+      ? data
+      : err.message || 'Error al generar la rutina con IA';
+  return new AiServiceError(fallbackMsg, { status, body: data, isBackend: false });
+};
+
 // ======== Servicio AI ========
 export const generarRutinaAI = async (
   payload: GenerarRutinaAIRequest
 ): Promise<GenerarRutinaAIResponse> => {
+  const headers = await authHeaders();
+
+  // Normalización mínima (el backend ya valida todo)
+  const body: GenerarRutinaAIRequest = {
+    ...payload,
+    dia: ensureYMD(payload.dia),
+  };
+
   try {
-    const headers = await authHeaders();
-
-    // Normalización mínima (el backend ya valida todo)
-    const body: GenerarRutinaAIRequest = {
-      ...payload,
-      dia: ensureYMD(payload.dia),
-    };
-
     const response = await axios.post(`${API_URL}/ai/rutinas`, body, { headers });
-    // Backend: 201 + { message, data: { rutina, rutina_ejercicios, explicacion_ai } }
-    return response.data as GenerarRutinaAIResponse;
-  } catch (error: any) {
-    const msg =
-      error?.response?.data?.message ??
-      (typeof error?.response?.data === 'string' ? error.response.data : null) ??
-      'Error al generar la rutina con IA';
-    throw new Error(msg);
+
+    // Éxito: 201 + { message, data: {...}, debug_ai? }
+    const data = response.data as GenerarRutinaAIResponse;
+    return data;
+  } catch (e: any) {
+    if (axios.isAxiosError(e)) {
+      throw normalizeAxiosError(e);
+    }
+    // Error no Axios (throw, parsing, etc.)
+    const msg = e?.message || 'Error inesperado en el cliente';
+    throw new AiServiceError(msg, { isBackend: false });
   }
 };
 
