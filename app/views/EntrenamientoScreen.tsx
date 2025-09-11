@@ -76,6 +76,40 @@ export default function EntrenamientoScreen() {
       return { ...prev, [id]: arr };
     });
   };
+
+  // Una "serie válida" será aquella con al menos un dato útil:
+  // - repeticiones > 0  o  peso > 0
+  // (0 kg con repeticiones > 0 es válido para peso corporal)
+  const strToNumber = (s: string) => {
+    const n = parseFloat((s ?? "").replace(",", "."));
+    return Number.isFinite(n) ? n : NaN;
+  };
+
+  const isSerieValida = (repStr: string, pesoStr: string) => {
+    const reps = strToNumber(repStr);
+    const peso = strToNumber(pesoStr);
+    return (Number.isFinite(reps) && reps > 0) || (Number.isFinite(peso) && peso > 0);
+  };
+
+  /**
+   * Recorta el objeto marcas:
+   * - Elimina series vacías por ejercicio
+   * - Elimina ejercicios que queden sin series válidas
+   * Devuelve un nuevo objeto (no muta el original)
+   */
+  const sanitizeMarcasForSubmit = (
+    input: Record<number, { repeticiones: string; peso: string }[]>
+  ) => {
+    const out: Record<number, { repeticiones: string; peso: string }[]> = {};
+    Object.entries(input).forEach(([ejIdStr, arr]) => {
+      const cleanArr = (arr ?? []).filter(s => isSerieValida(s.repeticiones, s.peso));
+      if (cleanArr.length > 0) {
+        out[Number(ejIdStr)] = cleanArr;
+      }
+    });
+    return out;
+  };
+
   // ==================================
 
   // 🔹 Acción finalizar: confirmación + llamada al VM + navegación
@@ -85,13 +119,20 @@ export default function EntrenamientoScreen() {
       '¿Deseas guardar tus marcas? Las series vacías se ignorarán',
       async () => {
         try {
-          const resp = await handleFinalizar(marcas);
-          // resp: { ok: true, resumen: Array<{ ejercicio_id, marca_personal_id, seriesCreadas }> }
+          // 🔒 Filtra antes de enviar al VM
+          const cleaned = sanitizeMarcasForSubmit(marcas);
+
+          // Si no queda nada, no llames al backend
+          if (Object.keys(cleaned).length === 0) {
+            showAlert('Sin datos', 'No hay series válidas para registrar.');
+            return;
+          }
+
+          const resp = await handleFinalizar(cleaned);
           showAlert(
             '¡Entrenamiento finalizado!',
             `Se registraron ${resp.resumen.reduce((acc, r) => acc + r.seriesCreadas, 0)} series.`
           );
-          // 👇 Navegar a Home inmediatamente
           navigation.navigate('Home');
         } catch (e: any) {
           showAlert('Error', e?.message ?? 'No se pudo finalizar el entrenamiento.');
@@ -99,6 +140,7 @@ export default function EntrenamientoScreen() {
       }
     );
   };
+
 
   if (loading) {
     return (
