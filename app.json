@@ -8,11 +8,9 @@
     "scheme": "trainup",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-
     "ios": {
       "supportsTablet": true
     },
-
     "android": {
       "package": "com.soffsas.trainup",
       "icon": "./assets/images/icon.png",
@@ -22,12 +20,10 @@
       },
       "edgeToEdgeEnabled": true
     },
-
     "web": {
       "bundler": "metro",
       "favicon": "./assets/images/favicon.png"
     },
-
     "plugins": [
       [
         "expo-splash-screen",
@@ -40,8 +36,18 @@
       ],
       [
         "expo-build-properties",
-        { "android": { "usesCleartextTraffic": true } }
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "84bcd1e3-c4ce-4ec8-90df-92060f3ac24d"
+      }
+    },
+    "owner": "franzfernandez97"
   }
 }
