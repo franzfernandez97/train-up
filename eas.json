@@ -3,14 +3,12 @@
   "build": {
     "preview": {
       "credentialsSource": "local",
+      "env": {
+        "ANDROID_SDK_ROOT": "/opt/android/sdk",
+        "ANDROID_HOME": "/opt/android/sdk",
+        "JAVA_HOME": "/usr/lib/jvm/java-17-openjdk-amd64"
+      },
       "android": { "buildType": "apk" }
-    },
-    "debug": {
-      "developmentClient": false,
-      "credentialsSource": "local",
-      "android": {
-        "gradleCommand": ":app:assembleDebug"
-      }
     }
   }
 }

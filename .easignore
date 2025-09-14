@@ -1,0 +1,22 @@
+# Ignora node_modules pesados
+node_modules
+
+# Ignora cachés
+.expo
+.expo-shared
+
+# Ignora llaves y certificados sensibles
+*.jks
+*.p12
+*.keystore
+*.pem
+
+# Ignora builds locales
+dist
+build
+*.apk
+*.aab
+
+# Re-incluye android/ y local.properties (¡IMPORTANTE!)
+!android/
+!android/local.properties
